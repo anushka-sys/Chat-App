@@ -11,8 +11,6 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
 import firestore from '@react-native-firebase/firestore';
 import uuid from 'react-native-uuid';
-import Icon from 'react-native-vector-icons/Ionicons';
-import Icone from 'react-native-vector-icons/EvilIcons';
 
 const SignupScreen = () => {
   const navigation = useNavigation();
@@ -42,11 +40,14 @@ const SignupScreen = () => {
   return (
     <SafeAreaView style={styles.safe}>
       <View style={styles.container}>
+
+        {/* Header */}
         <Text style={styles.title}>Create Account</Text>
         <Text style={styles.subtitle}>
           Create an account so you can explore all the existing jobs
         </Text>
 
+        {/* Email */}
         <View style={styles.inputWrap}>
           <TextInput
             style={styles.input}
@@ -59,6 +60,7 @@ const SignupScreen = () => {
           />
         </View>
 
+        {/* Password */}
         <View style={styles.inputWrap}>
           <TextInput
             style={styles.input}
@@ -70,6 +72,7 @@ const SignupScreen = () => {
           />
         </View>
 
+        {/* Confirm Password */}
         <View style={styles.inputWrap}>
           <TextInput
             style={styles.input}
@@ -81,12 +84,12 @@ const SignupScreen = () => {
           />
         </View>
 
-        <View style={styles.buttoncontainer}>
-          <TouchableOpacity style={styles.button} onPress={registerUser}>
-            <Text style={styles.buttonText}>Sign up</Text>
-          </TouchableOpacity>
-        </View>
+        {/* Sign Up Button */}
+        <TouchableOpacity style={styles.button} onPress={registerUser}>
+          <Text style={styles.buttonText}>Sign up</Text>
+        </TouchableOpacity>
 
+        {/* Already have account */}
         <TouchableOpacity
           style={styles.loginLink}
           onPress={() => navigation.navigate('Login')}
@@ -94,28 +97,35 @@ const SignupScreen = () => {
           <Text style={styles.loginText}>Already have an account</Text>
         </TouchableOpacity>
 
+        {/* Or continue with */}
         <Text style={styles.orText}>Or continue with</Text>
 
+        {/* Social Icons Row */}
         <View style={styles.socialRow}>
+          {/* Google */}
           <TouchableOpacity style={styles.socialBtn}>
-            <Icon name="logo-google" size={25} />
+            <Text style={styles.socialIcon}>G</Text>
           </TouchableOpacity>
 
+          {/* Facebook */}
           <TouchableOpacity style={styles.socialBtn}>
-            <Icone name="sc-facebook" size={35} />
+            <Text style={styles.socialIcon}>f</Text>
           </TouchableOpacity>
 
+          {/* Apple */}
           <TouchableOpacity style={styles.socialBtn}>
-            {/* <Text style={styles.socialIcon}></Text> */}
-            <Icon name="mail" size={25} />
+            <Text style={styles.socialIcon}></Text>
           </TouchableOpacity>
         </View>
+
       </View>
     </SafeAreaView>
   );
 };
 
 export default SignupScreen;
+
+const BLUE = '#002DE3';
 
 const styles = StyleSheet.create({
   safe: {
@@ -129,10 +139,11 @@ const styles = StyleSheet.create({
     paddingTop: 48,
   },
 
+  // Header
   title: {
     fontSize: 26,
     fontWeight: '700',
-    color: '#002DE3',
+    color: BLUE,
     marginBottom: 10,
     textAlign: 'center',
   },
@@ -145,10 +156,11 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
   },
 
+  // Inputs
   inputWrap: {
-    width: '90%',
+    width: '100%',
     borderWidth: 1.5,
-    // borderColor: BLUE,
+    borderColor: BLUE,
     borderRadius: 8,
     marginBottom: 16,
     backgroundColor: '#FFFFFF',
@@ -160,14 +172,20 @@ const styles = StyleSheet.create({
     color: '#1A1A1A',
   },
 
-  buttoncontainer: {
-    width: '90%',
-    backgroundColor: '#002DE3',
+  // Button
+  button: {
+    width: '100%',
+    backgroundColor: BLUE,
     borderRadius: 30,
     paddingVertical: 15,
     alignItems: 'center',
-    // paddingTop: 10,
-    marginTop: 20,
+    marginTop: 10,
+    marginBottom: 20,
+    shadowColor: BLUE,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 6,
+    elevation: 4,
   },
   buttonText: {
     color: '#FFFFFF',
@@ -176,28 +194,30 @@ const styles = StyleSheet.create({
     letterSpacing: 0.5,
   },
 
+  // Already have account
   loginLink: {
-    paddingTop: 10,
-    paddingBottom: 28,
+    marginBottom: 28,
   },
   loginText: {
     color: '#4A4A4A',
     fontSize: 14,
   },
 
+  // Or continue with
   orText: {
-    color: '#002DE3',
+    color: BLUE,
     fontSize: 13,
     marginBottom: 18,
   },
 
+  // Social
   socialRow: {
     flexDirection: 'row',
     gap: 20,
   },
   socialBtn: {
-    width: 60,
-    height: 60,
+    width: 50,
+    height: 50,
     borderRadius: 10,
     borderWidth: 1,
     borderColor: '#D0D5E8',
