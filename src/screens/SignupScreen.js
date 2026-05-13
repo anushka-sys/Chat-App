@@ -10,6 +10,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
 import firestore from '@react-native-firebase/firestore';
 import uuid from 'react-native-uuid';
+import Loader from '../components/Loader'
 
 const SignupScreen = () => {
   const navigation = useNavigation();
@@ -69,6 +70,7 @@ const SignupScreen = () => {
         onPress={()=>navigation.navigate('Login')}
         >
           <Text style={styles.logintxt}>or Log in </Text>
+          {/* <Loader /> */}
         </TouchableOpacity>
       </View>
     </SafeAreaView>

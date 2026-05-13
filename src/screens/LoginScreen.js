@@ -14,21 +14,37 @@ const LoginScreen = () => {
   const [pass, setPass] = useState('');
   const [email, setEmail] = useState('');
 
-const loginUser = () =>{
-firestore().collection("users").where("email","==",email).get()
-.then(res=>{
-  console.log(JSON.stringify(res.docs));
-  
-  if(res.docs !== []){
-   console.log(JSON.stringify(res.docs[0].data()));
-  }else{
-    Alert.alert('User not found')
-  }
-}).catch(error => {
-  console.log(error);
-   Alert.alert('User not found')
-})
-}
+  const loginUser = () => {
+    if(!email || !pass)
+    {
+      Alert.alert('Error',"Please enter valid email and password");
+      return;
+    }
+    firestore()
+      .collection('users')
+      .where('email', '==', email.trim())
+      //.where('pass','==',pass)
+      .get()
+      .then(res => {
+        
+        if (res.docs.length > 0) {
+          const user = res.docs[0].data();
+          if(user.password == pass.trim())
+          {
+            Alert.alert('Success',"Login successful");
+            console.log("logged in successful",user)
+          } else{
+            Alert.alert('error','invalid password')
+          }
+        } else {
+          Alert.alert('no user found with this email');
+        }
+      })
+      .catch(error => {
+        console.log(error);
+        Alert.alert('something went wrong');
+      });
+  };
 
   return (
     <SafeAreaView style={styles.safe}>
@@ -56,9 +72,7 @@ firestore().collection("users").where("email","==",email).get()
         </View>
 
         <View style={styles.buttonwraper}>
-          <TouchableOpacity style={styles.button}
-          onPress={()=>{loginUser}}
-          >
+          <TouchableOpacity style={styles.button} onPress={() => loginUser()}>
             <Text style={styles.btntext}>Log in</Text>
           </TouchableOpacity>
         </View>

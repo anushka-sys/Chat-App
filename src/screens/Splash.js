@@ -56,8 +56,8 @@ bottomSection:{
 },
 
 image:{
-  height:220,
-  width:220,
+  height:620,
+  width:370,
   resizeMode:'contain'
 },
 
