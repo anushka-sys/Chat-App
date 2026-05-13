@@ -1,4 +1,5 @@
 import {
+  Alert,
   StyleSheet,
   Text,
   TextInput,
@@ -7,12 +8,27 @@ import {
 } from 'react-native';
 import React, { useState } from 'react';
 import { SafeAreaView } from 'react-native-safe-area-context';
-
+import firestore from '@react-native-firebase/firestore';
 
 const LoginScreen = () => {
   const [pass, setPass] = useState('');
   const [email, setEmail] = useState('');
 
+const loginUser = () =>{
+firestore().collection("users").where("email","==",email).get()
+.then(res=>{
+  console.log(JSON.stringify(res.docs));
+  
+  if(res.docs !== []){
+   console.log(JSON.stringify(res.docs[0].data()));
+  }else{
+    Alert.alert('User not found')
+  }
+}).catch(error => {
+  console.log(error);
+   Alert.alert('User not found')
+})
+}
 
   return (
     <SafeAreaView style={styles.safe}>
@@ -22,7 +38,8 @@ const LoginScreen = () => {
         <View style={styles.input}>
           <TextInput
             style={styles.email}
-            placeholder="Enter mail"
+            placeholder="Enter your mail"
+            placeholderTextColor="grey"
             value={email}
             onChangeText={txt => setEmail(txt)}
           />
@@ -32,14 +49,17 @@ const LoginScreen = () => {
           <TextInput
             style={styles.email}
             placeholder="Enter password"
+            placeholderTextColor="grey"
             value={pass}
             onChangeText={txt => setPass(txt)}
           />
         </View>
 
         <View style={styles.buttonwraper}>
-          <TouchableOpacity style={styles.button}>
-            <Text style={styles.btntext}>Sign in</Text>
+          <TouchableOpacity style={styles.button}
+          onPress={()=>{loginUser}}
+          >
+            <Text style={styles.btntext}>Log in</Text>
           </TouchableOpacity>
         </View>
       </View>

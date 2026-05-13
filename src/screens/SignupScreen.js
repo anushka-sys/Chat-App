@@ -25,6 +25,7 @@ const SignupScreen = () => {
         password:pass,
       }).then(res=>{
         console.log('user created');
+        navigation.navigate('Login')
       }).catch(error => {
         console.log(error);
       })
@@ -38,7 +39,8 @@ const SignupScreen = () => {
         <View style={styles.input}>
           <TextInput 
           style={styles.email}
-           placeholder="Enter mail" 
+           placeholder="Enter your mail" 
+           placeholderTextColor="grey"
            value={email}
            onChangeText={txt => setEmail(txt)}
            />
@@ -48,6 +50,7 @@ const SignupScreen = () => {
           <TextInput 
           style={styles.email} 
           placeholder="Enter password"
+          placeholderTextColor="grey"
           value={pass}
           onChangeText={txt => setPass(txt)}
           />
