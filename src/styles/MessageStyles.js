@@ -1,11 +1,11 @@
-import styled from 'styled-components';
+// MessageStyles.js
+
+import styled from 'styled-components/native';
 
 export const Container = styled.View`
   flex: 1;
-  padding-left: 20px;
-  padding-right: 20px;
-  align-items: center;
   background-color: #ffffff;
+  padding-horizontal: 20px;
 `;
 
 export const Card = styled.TouchableOpacity`
@@ -14,50 +14,46 @@ export const Card = styled.TouchableOpacity`
 
 export const UserInfo = styled.View`
   flex-direction: row;
-  justify-content: space-between;
+  align-items: center;
 `;
 
 export const UserImgWrapper = styled.View`
-  padding-top: 15px;
-  padding-bottom: 15px;
+  padding-vertical: 15px;
 `;
 
 export const UserImg = styled.Image`
-  width: 50px;
-  height: 50px;
-  border-radius: 25px;
+  width: 60px;
+  height: 60px;
+  border-radius: 30px;
 `;
 
 export const TextSection = styled.View`
-  flex-direction: column;
-  justify-content: center;
-  padding: 15px;
-  padding-left: 0;
-  margin-left: 10px;
-  width: 300px;
+  flex: 1;
+  margin-left: 12px;
+  padding-vertical: 15px;
   border-bottom-width: 1px;
-  border-bottom-color: #cccccc;
+  border-bottom-color: #e6e6e6;
 `;
 
 export const UserInfoText = styled.View`
   flex-direction: row;
   justify-content: space-between;
+  align-items: center;
   margin-bottom: 5px;
 `;
 
 export const UserName = styled.Text`
-  font-size: 14px;
+  font-size: 16px;
   font-weight: bold;
-  font-family: 'Lato-Regular';
+  color: #000;
 `;
 
 export const PostTime = styled.Text`
   font-size: 12px;
-  color: #666;
-  font-family: 'Lato-Regular';
+  color: #666666;
 `;
 
 export const MessageText = styled.Text`
   font-size: 14px;
-  color: #333333;
+  color: #555555;
 `;

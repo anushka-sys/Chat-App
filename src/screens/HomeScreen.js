@@ -1,5 +1,6 @@
-import { StyleSheet, Text, View,FlatList } from 'react-native'
-import React from 'react' 
+import React from 'react';
+import { FlatList } from 'react-native';
+
 import {
   Container,
   Card,
@@ -17,7 +18,7 @@ const Messages = [
   {
     id: '1',
     userName: 'Jenny Doe',
-    //userImg: require('../assets/users/user-3.jpg'),
+    userImg: require('../assets/user-1.jpg'),
     messageTime: '4 mins ago',
     messageText:
       'Hey there, this is my test for a post of my social app in React Native.',
@@ -25,7 +26,7 @@ const Messages = [
   {
     id: '2',
     userName: 'John Doe',
-    //userImg: require('../assets/users/user-1.jpg'),
+    userImg: require('../assets/user-2.jpg'),
     messageTime: '2 hours ago',
     messageText:
       'Hey there, this is my test for a post of my social app in React Native.',
@@ -33,41 +34,57 @@ const Messages = [
   {
     id: '3',
     userName: 'Ken William',
-    //userImg: require('../assets/users/user-4.jpg'),
-    messageTime: '1 hours ago',
+    userImg: require('../assets/user-4.jpg'),
+    messageTime: '1 hour ago',
     messageText:
       'Hey there, this is my test for a post of my social app in React Native.',
   },
   {
     id: '4',
     userName: 'Selina Paul',
-   // userImg: require('../assets/users/user-6.jpg'),
+    userImg: require('../assets/user-3.jpg'),
     messageTime: '1 day ago',
-    messageText:
-      'Hey there, this is my test for a post of my social app in React Native.',
-  },
-  {
-    id: '5',
-    userName: 'Christy Alex',
-    //userImg: require('../assets/users/user-7.jpg'),
-    messageTime: '2 days ago',
     messageText:
       'Hey there, this is my test for a post of my social app in React Native.',
   },
 ];
 
-const HomeScreen = () => {
+const HomeScreen = ({ navigation }) => {
+  const renderItem = ({ item }) => (
+    <Card
+      onPress={() =>
+        navigation.navigate('Chat', {
+          userName: item.userName,
+        })
+      }
+    >
+      <UserInfo>
+        <UserImgWrapper>
+          <UserImg source={item.userImg} />
+        </UserImgWrapper>
+
+        <TextSection>
+          <UserInfoText>
+            <UserName>{item.userName}</UserName>
+            <PostTime>{item.messageTime}</PostTime>
+          </UserInfoText>
+
+          <MessageText numberOfLines={1}>{item.messageText}</MessageText>
+        </TextSection>
+      </UserInfo>
+    </Card>
+  );
+
   return (
-    <View>
-      <Text>HomeScreen</Text>
-      <FlatList 
-      data={Messages}
-      keyExtractor={item => item.id}
+    <Container>
+      <FlatList
+        data={Messages}
+        keyExtractor={item => item.id}
+        renderItem={renderItem}
+        showsVerticalScrollIndicator={false}
       />
-    </View>
-  )
-}
+    </Container>
+  );
+};
 
-export default HomeScreen
-
-const styles = StyleSheet.create({})
+export default HomeScreen;
