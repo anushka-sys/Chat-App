@@ -6,11 +6,11 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
-import React, {useState} from 'react';
-import {SafeAreaView} from 'react-native-safe-area-context';
+import React, { useState } from 'react';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import firestore from '@react-native-firebase/firestore';
-import {useNavigation} from '@react-navigation/native';
-
+import { useNavigation } from '@react-navigation/native';
+import auth from '@react-native-firebase/auth';
 import Icon from 'react-native-vector-icons/Ionicons';
 import Icone from 'react-native-vector-icons/EvilIcons';
 
@@ -83,18 +83,18 @@ const LoginScreen = () => {
         </View>
 
         <TouchableOpacity
-  style={styles.buttoncontainer}
-  onPress={loginUser}
-  activeOpacity={0.7}>
-  <Text style={styles.buttonText}>Log in</Text>
-</TouchableOpacity>
+          style={styles.buttoncontainer}
+          onPress={loginUser}
+          activeOpacity={0.7}
+        >
+          <Text style={styles.buttonText}>Log in</Text>
+        </TouchableOpacity>
 
         <TouchableOpacity
           style={styles.signupLink}
-          onPress={() => navigation.navigate('Signup')}>
-          <Text style={styles.signupText}>
-            Don’t have an account? Sign up
-          </Text>
+          onPress={() => navigation.navigate('Signup')}
+        >
+          <Text style={styles.signupText}>Don't have an account? Sign up</Text>
         </TouchableOpacity>
 
         <Text style={styles.orText}>Or continue with</Text>
@@ -165,21 +165,21 @@ const styles = StyleSheet.create({
     color: '#1A1A1A',
   },
 
-buttoncontainer: {
-  width: '90%',
-  backgroundColor: '#002DE3',
-  borderRadius: 30,
-  paddingVertical: 15,
-  alignItems: 'center',
-  marginTop: 20,
-},
+  buttoncontainer: {
+    width: '90%',
+    backgroundColor: '#002DE3',
+    borderRadius: 30,
+    paddingVertical: 15,
+    alignItems: 'center',
+    marginTop: 20,
+  },
 
-buttonText: {
-  color: '#FFFFFF',
-  fontSize: 16,
-  fontWeight: '600',
-  letterSpacing: 0.5,
-},
+  buttonText: {
+    color: '#FFFFFF',
+    fontSize: 16,
+    fontWeight: '600',
+    letterSpacing: 0.5,
+  },
 
   button: {
     backgroundColor: '#002DE3',
