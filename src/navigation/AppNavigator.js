@@ -6,6 +6,7 @@ import SignupScreen from '../screens/SignupScreen'
 import Splash from '../screens/Splash'
 import TabNavigator from '../navigation/TabNavigator';
 
+
 const Stack = createStackNavigator();
 
 const AppNavigator = () => {

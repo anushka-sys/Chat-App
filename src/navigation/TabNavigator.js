@@ -3,24 +3,20 @@ import React from 'react';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import HomeScreen from '../screens/HomeScreen';
 import ProfileScreen from '../screens/ProfileScreen';
+import SettingScreen from '../screens/Settingscreen';
 import Icon from 'react-native-vector-icons/Ionicons';
 
 const Tab = createBottomTabNavigator();
 
 const TabNavigator = () => {
   return (
-    <Tab.Navigator 
-    screenOptions={({ route }) => ({
-        headerShown: false,
+    <Tab.Navigator
+      screenOptions={({ route }) => ({
+        //   tabBarActiveTintColor: '#d3d3d3',
+        // tabBarInactiveTintColor: '#d3d3d3',
 
-        // Active + Inactive Icon Colors
-        tabBarActiveTintColor: '#d3d3d3',
-        tabBarInactiveTintColor: '#d3d3d3',
-
-        // Hide Labels
         tabBarShowLabel: false,
 
-        // Tab Bar Styling
         tabBarStyle: {
           position: 'absolute',
           bottom: 0,
@@ -29,22 +25,15 @@ const TabNavigator = () => {
 
           height: 70,
 
-         // backgroundColor: '#111',
-
-          // Rounded Top Corners
           borderTopLeftRadius: 25,
           borderTopRightRadius: 25,
-
-          // Remove Default Border
-          borderTopWidth: 0,
-
         },
 
         // Icon Styling
         tabBarIcon: ({ focused, color, size }) => {
           let iconName;
 
-          if (route.name === 'HomeTab') {
+          if (route.name === 'Home') {
             iconName = focused ? 'home' : 'home-outline';
           } else if (route.name === 'Profile') {
             iconName = focused ? 'person' : 'person-outline';
@@ -52,18 +41,13 @@ const TabNavigator = () => {
             iconName = focused ? 'settings' : 'settings-outline';
           }
 
-          return (
-            <Icon
-              name={iconName}
-              size={26}
-              color="#d3d3d3"
-            />
-          );
+          return <Icon name={iconName} size={26} color="#7a7a7a" />;
         },
       })}
     >
       <Tab.Screen name="Home" component={HomeScreen} />
-       <Tab.Screen name="Profile" component={ProfileScreen} />
+      <Tab.Screen name="Profile" component={ProfileScreen} />
+      <Tab.Screen name="Settings" component={SettingScreen} />
     </Tab.Navigator>
   );
 };
