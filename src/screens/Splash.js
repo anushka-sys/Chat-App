@@ -1,10 +1,13 @@
-import { StyleSheet, Text, View, Image, TouchableOpacity } from 'react-native';
+import { StyleSheet, Text, View, Image, TouchableOpacity,useWindowDimensions } from 'react-native';
 import React from 'react';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
 
+
 const Splash = () => {
   const navigation = useNavigation();
+ // const {width,height} = Dimensions.get('window');
+  const {Screenwidth,Screenheight} = useWindowDimensions.get('window');
 
   return (
     <SafeAreaView style={styles.safe}>
@@ -56,8 +59,8 @@ const styles = StyleSheet.create({
   },
 
   image: {
-    // height:620,
-    width: '80%',
+    height: Screenwidth*0.8,
+    width: Screenheight*0.8,
     resizeMode: 'contain',
     paddingTop: 20,
     //aspectRatio:1,
