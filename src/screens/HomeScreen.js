@@ -47,7 +47,7 @@ const HomeScreen = () => {
           </View>
         </View>
         <View style={styles.textSection}>
-          <Text style={styles.userName}>{item.name}</Text>
+          <Text style={styles.userName}>{item.name || item.email}</Text>
           <Text style={styles.messageText}>Tap to chat</Text>
         </View>
       </View>
@@ -61,7 +61,7 @@ const HomeScreen = () => {
       </View>
     );
   }
-
+console.log('user data:', JSON.stringify(users[0]));
   return (
     <SafeAreaView style={styles.container}>
       <FlatList
