@@ -1,51 +1,76 @@
 import {
-  StyleSheet,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  View,
-  Image,
+  StyleSheet, Text, TextInput,
+  TouchableOpacity, View, Alert,
 } from 'react-native';
 import React, { useState } from 'react';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
+import auth from '@react-native-firebase/auth';
 import firestore from '@react-native-firebase/firestore';
-import uuid from 'react-native-uuid';
 import Icon from 'react-native-vector-icons/Ionicons';
 import Icone from 'react-native-vector-icons/EvilIcons';
 
 const SignupScreen = () => {
   const navigation = useNavigation();
-
   const [email, setEmail] = useState('');
   const [pass, setPass] = useState('');
   const [confirmPass, setConfirmPass] = useState('');
+  const [loading, setLoading] = useState(false);
 
-  const registerUser = () => {
-    const userId = uuid.v4();
-    firestore()
-      .collection('users')
-      .doc(userId)
-      .set({
-        email: email,
-        password: pass,
-      })
-      .then(() => {
-        console.log('user created');
-        navigation.navigate('Login');
-      })
-      .catch(error => {
-        console.log(error);
+  const registerUser = async () => {
+    // Basic validation
+    if (!email || !pass || !confirmPass) {
+      Alert.alert('Error', 'Please fill all fields');
+      return;
+    }
+    if (pass !== confirmPass) {
+      Alert.alert('Error', 'Passwords do not match');
+      return;
+    }
+    if (pass.length < 6) {
+      Alert.alert('Error', 'Password must be at least 6 characters');
+      return;
+    }
+
+    setLoading(true);
+    try {
+      // Firebase Auth creates the user securely — NO plain text password stored!
+      const userCredential = await auth().createUserWithEmailAndPassword(
+        email.trim(),
+        pass
+      );
+
+      const uid = userCredential.user.uid;
+
+      // Save user profile in Firestore (email only, NO password)
+      await firestore().collection('users').doc(uid).set({
+        uid: uid,
+        email: email.trim(),
+        createdAt: firestore.FieldValue.serverTimestamp(),
       });
+      
+      await auth().signOut();
+
+      Alert.alert('Success', 'Account created! Please login.');
+      navigation.replace('Login');
+    } catch (error) {
+      console.log('Signup error:', error);
+      if (error.code === 'auth/email-already-in-use') {
+        Alert.alert('Error', 'Email already in use');
+      } else if (error.code === 'auth/invalid-email') {
+        Alert.alert('Error', 'Invalid email address');
+      } else {
+        Alert.alert('Error', error.message);
+      }
+    }
+    setLoading(false);
   };
 
   return (
     <SafeAreaView style={styles.safe}>
       <View style={styles.container}>
         <Text style={styles.title}>Create Account</Text>
-        <Text style={styles.subtitle}>
-          Create an account so you can explore all the existing jobs
-        </Text>
+        <Text style={styles.subtitle}>Sign up to start chatting</Text>
 
         <View style={styles.inputWrap}>
           <TextInput
@@ -53,7 +78,7 @@ const SignupScreen = () => {
             placeholder="Email"
             placeholderTextColor="#9EACC7"
             value={email}
-            onChangeText={txt => setEmail(txt)}
+            onChangeText={setEmail}
             keyboardType="email-address"
             autoCapitalize="none"
           />
@@ -65,7 +90,7 @@ const SignupScreen = () => {
             placeholder="Password"
             placeholderTextColor="#9EACC7"
             value={pass}
-            onChangeText={txt => setPass(txt)}
+            onChangeText={setPass}
             secureTextEntry
           />
         </View>
@@ -76,40 +101,27 @@ const SignupScreen = () => {
             placeholder="Confirm Password"
             placeholderTextColor="#9EACC7"
             value={confirmPass}
-            onChangeText={txt => setConfirmPass(txt)}
+            onChangeText={setConfirmPass}
             secureTextEntry
           />
         </View>
 
-        <View style={styles.buttoncontainer}>
-          <TouchableOpacity style={styles.button} onPress={registerUser}>
-            <Text style={styles.buttonText}>Sign up</Text>
-          </TouchableOpacity>
-        </View>
+        <TouchableOpacity
+          style={styles.buttoncontainer}
+          onPress={registerUser}
+          disabled={loading}
+        >
+          <Text style={styles.buttonText}>
+            {loading ? 'Creating Account...' : 'Sign up'}
+          </Text>
+        </TouchableOpacity>
 
         <TouchableOpacity
           style={styles.loginLink}
           onPress={() => navigation.navigate('Login')}
         >
-          <Text style={styles.loginText}>Already have an account</Text>
+          <Text style={styles.loginText}>Already have an account? Login</Text>
         </TouchableOpacity>
-
-        <Text style={styles.orText}>Or continue with</Text>
-
-        <View style={styles.socialRow}>
-          <TouchableOpacity style={styles.socialBtn}>
-            <Icon name="logo-google" size={25} />
-          </TouchableOpacity>
-
-          <TouchableOpacity style={styles.socialBtn}>
-            <Icone name="sc-facebook" size={35} />
-          </TouchableOpacity>
-
-          <TouchableOpacity style={styles.socialBtn}>
-            {/* <Text style={styles.socialIcon}></Text> */}
-            <Icon name="mail" size={25} />
-          </TouchableOpacity>
-        </View>
       </View>
     </SafeAreaView>
   );
@@ -117,97 +129,16 @@ const SignupScreen = () => {
 
 export default SignupScreen;
 
+// Keep your existing styles from SignupScreen.js — they're fine
 const styles = StyleSheet.create({
-  safe: {
-    flex: 1,
-    backgroundColor: '#FFFFFF',
-  },
-  container: {
-    flex: 1,
-    alignItems: 'center',
-    paddingHorizontal: 24,
-    paddingTop: 48,
-  },
-
-  title: {
-    fontSize: 26,
-    fontWeight: '700',
-    color: '#002DE3',
-    marginBottom: 10,
-    textAlign: 'center',
-  },
-  subtitle: {
-    fontSize: 14,
-    color: '#4A4A4A',
-    textAlign: 'center',
-    lineHeight: 20,
-    marginBottom: 36,
-    paddingHorizontal: 16,
-  },
-
-  inputWrap: {
-    width: '90%',
-    borderWidth: 1.5,
-    // borderColor: BLUE,
-    borderRadius: 8,
-    marginBottom: 16,
-    backgroundColor: '#FFFFFF',
-  },
-  input: {
-    paddingVertical: 14,
-    paddingHorizontal: 16,
-    fontSize: 15,
-    color: '#1A1A1A',
-  },
-
-  buttoncontainer: {
-    width: '90%',
-    backgroundColor: '#002DE3',
-    borderRadius: 30,
-    paddingVertical: 15,
-    alignItems: 'center',
-    // paddingTop: 10,
-    marginTop: 20,
-  },
-  buttonText: {
-    color: '#FFFFFF',
-    fontSize: 16,
-    fontWeight: '600',
-    letterSpacing: 0.5,
-  },
-
-  loginLink: {
-    paddingTop: 10,
-    paddingBottom: 28,
-  },
-  loginText: {
-    color: '#4A4A4A',
-    fontSize: 14,
-  },
-
-  orText: {
-    color: '#002DE3',
-    fontSize: 13,
-    marginBottom: 18,
-  },
-
-  socialRow: {
-    flexDirection: 'row',
-    gap: 20,
-  },
-  socialBtn: {
-    width: 60,
-    height: 60,
-    borderRadius: 10,
-    borderWidth: 1,
-    borderColor: '#D0D5E8',
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: '#FAFAFA',
-  },
-  socialIcon: {
-    fontSize: 18,
-    fontWeight: '600',
-    color: '#1A1A1A',
-  },
+  safe: { flex: 1, backgroundColor: '#FFFFFF' },
+  container: { flex: 1, alignItems: 'center', paddingHorizontal: 24, paddingTop: 48 },
+  title: { fontSize: 26, fontWeight: '700', color: '#002DE3', marginBottom: 10, textAlign: 'center' },
+  subtitle: { fontSize: 14, color: '#4A4A4A', textAlign: 'center', lineHeight: 20, marginBottom: 36, paddingHorizontal: 16 },
+  inputWrap: { width: '90%', borderWidth: 1.5, borderColor: '#D0D5E8', borderRadius: 8, marginBottom: 16, backgroundColor: '#FFFFFF' },
+  input: { paddingVertical: 14, paddingHorizontal: 16, fontSize: 15, color: '#1A1A1A' },
+  buttoncontainer: { width: '90%', backgroundColor: '#002DE3', borderRadius: 30, paddingVertical: 15, alignItems: 'center', marginTop: 20 },
+  buttonText: { color: '#FFFFFF', fontSize: 16, fontWeight: '600', letterSpacing: 0.5 },
+  loginLink: { paddingTop: 18, paddingBottom: 28 },
+  loginText: { color: '#4A4A4A', fontSize: 14 },
 });
