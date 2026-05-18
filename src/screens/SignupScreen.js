@@ -12,6 +12,8 @@ import Icone from 'react-native-vector-icons/EvilIcons';
 
 const SignupScreen = () => {
   const navigation = useNavigation();
+
+  const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [pass, setPass] = useState('');
   const [confirmPass, setConfirmPass] = useState('');
@@ -19,7 +21,7 @@ const SignupScreen = () => {
 
   const registerUser = async () => {
     // Basic validation
-    if (!email || !pass || !confirmPass) {
+    if (!name ||!email || !pass || !confirmPass) {
       Alert.alert('Error', 'Please fill all fields');
       return;
     }
@@ -46,6 +48,7 @@ const SignupScreen = () => {
       await firestore().collection('users').doc(uid).set({
         uid: uid,
         email: email.trim(),
+        name: name.trim(),
         createdAt: firestore.FieldValue.serverTimestamp(),
       });
       
@@ -71,6 +74,17 @@ const SignupScreen = () => {
       <View style={styles.container}>
         <Text style={styles.title}>Create Account</Text>
         <Text style={styles.subtitle}>Sign up to start chatting</Text>
+
+        <View style={styles.inputWrap}>
+          <TextInput
+            style={styles.input}
+            placeholder="Enter your Name"
+            placeholderTextColor="#9EACC7"
+            value={name}
+            onChangeText={setName}
+            autoCapitalize="none"
+          />
+        </View>
 
         <View style={styles.inputWrap}>
           <TextInput

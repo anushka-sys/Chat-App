@@ -1,111 +1,101 @@
 import React, { useEffect, useState, useCallback } from 'react';
-
-import {
-  View,
-  KeyboardAvoidingView,
-  Platform,
-  StyleSheet,
-} from 'react-native';
-
+import { View, KeyboardAvoidingView, Platform, StyleSheet } from 'react-native';
 import { GiftedChat } from 'react-native-gifted-chat';
-
 import auth from '@react-native-firebase/auth';
 import firestore from '@react-native-firebase/firestore';
 
-const ChatScreen = () => {
+const ChatScreen = ({ route }) => {
+  // Pass receiverUid + receiverName when navigating to this screen
+  const { receiverUid, receiverName } = route.params;
 
   const [messages, setMessages] = useState([]);
+  const [senderName, setSenderName] = useState('');
 
-  // Realtime messages listener
+  const currentUser = auth().currentUser;
+
+  // Create a stable, shared conversation ID for these two users
+  const conversationId = [currentUser.uid, receiverUid].sort().join('_');
+
+  // Fetch the current user's name from Firestore
   useEffect(() => {
+    firestore()
+      .collection('users')
+      .doc(currentUser.uid)
+      .get()
+      .then(doc => {
+        if (doc.exists) {
+          setSenderName(doc.data().name || currentUser.email);
+        } else {
+          setSenderName(currentUser.email);
+        }
+      })
+      .catch(() => setSenderName(currentUser.email));
+  }, []);
 
+  // Listen only to THIS private conversation
+  useEffect(() => {
     const unsubscribe = firestore()
-      .collection('chats')
+      .collection('conversations') // New top-level collection
+      .doc(conversationId)
+      .collection('messages') // Sub-collection of messages
       .orderBy('createdAt', 'desc')
-      .onSnapshot(querySnapshot => {
-
-        const allMessages = querySnapshot.docs.map(doc => {
-
+      .onSnapshot(snapshot => {
+        const msgs = snapshot.docs.map(doc => {
           const data = doc.data();
-
           return {
             ...data,
             createdAt: data.createdAt?.toDate(),
           };
         });
-
-        setMessages(allMessages);
+        setMessages(msgs);
       });
 
     return unsubscribe;
+  }, [conversationId]);
 
-  }, []);
+  const onSend = useCallback(
+    async (messageArray = []) => {
+      const msg = messageArray[0];
+      const myMsg = {
+        _id: msg._id,
+        text: msg.text || '',
+        createdAt: new Date(),
+        sentBy: currentUser.uid,
+        sentTo: receiverUid,
+        user: {
+          _id: currentUser.uid,
+          name: senderName || currentUser.email || 'User', // Show name, fallback to email
+        },
+      };
 
-  // Send message
-  const onSend = useCallback(async (messageArray = []) => {
+      setMessages(prev => GiftedChat.append(prev, [myMsg]));
 
-    const msg = messageArray[0];
-
-    const myMsg = {
-      ...msg,
-
-      sentBy: auth().currentUser?.email,
-
-      sentTo: 'everyone',
-
-      createdAt: new Date(),
-    };
-
-    // Optimistic UI update
-    setMessages(previousMessages =>
-      GiftedChat.append(previousMessages, [myMsg]),
-    );
-
-    // Save in Firestore
-    await firestore()
-      .collection('chats')
-      .add(myMsg);
-
-  }, []);
+      await firestore()
+        .collection('conversations')
+        .doc(conversationId)
+        .collection('messages')
+        .add(myMsg);
+    },
+    [conversationId, senderName],
+  );
 
   return (
-
     <KeyboardAvoidingView
       style={styles.container}
       behavior={Platform.OS === 'ios' ? 'padding' : undefined}
-      keyboardVerticalOffset={0}
     >
-
       <GiftedChat
         messages={messages}
-
-        onSend={messages => onSend(messages)}
-
+        onSend={msgs => onSend(msgs)}
         user={{
-          _id: auth().currentUser?.email,
+          _id: currentUser.uid,
+          name: senderName,
         }}
-
-        // Remove extra top spacing
-        messagesContainerStyle={{
-          backgroundColor: '#fff',
-          paddingTop: 0,
-          marginTop: 0,
-        }}
-
-        // Better keyboard handling
-        bottomOffset={Platform.OS === 'android' ? 5 : 0}
-
-        // Remove avatar duplicates
-        showUserAvatar={false}
-
-        // Smooth scrolling
-        scrollToBottom
-
-        // Placeholder
+        messagesContainerStyle={{ backgroundColor: '#fff' }}
         placeholder="Type a message..."
-
+        scrollToBottom
+        showUserAvatar={false}
       />
-
     </KeyboardAvoidingView>
   );
 };
@@ -113,10 +103,8 @@ const ChatScreen = () => {
 export default ChatScreen;
 
 const styles = StyleSheet.create({
-
   container: {
     flex: 1,
     backgroundColor: '#fff',
   },
-
 });
