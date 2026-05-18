@@ -11,8 +11,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
 import auth from '@react-native-firebase/auth';
 import firestore from '@react-native-firebase/firestore';
-import Icon from 'react-native-vector-icons/Ionicons';
-import Icone from 'react-native-vector-icons/EvilIcons';
+
 
 const SignupScreen = () => {
   const navigation = useNavigation();
@@ -40,18 +39,18 @@ const SignupScreen = () => {
 
     setLoading(true);
     try {
-      const userCredential = await auth().createUserWithEmailAndPassword(
+      const userCredential = await auth().createUserWithEmailAndPassword( //create user acc
         email.trim(),
         pass,
       );
 
       const uid = userCredential.user.uid;
 
-      await firestore().collection('users').doc(uid).set({
+      await firestore().collection('users').doc(uid).set({ 
         uid: uid,
         email: email.trim(),
         name: name.trim(),
-        createdAt: firestore.FieldValue.serverTimestamp(),
+        createdAt: firestore.FieldValue.serverTimestamp(), //uses firestore time
       });
 
       await auth().signOut();

@@ -11,10 +11,8 @@ const ChatScreen = ({ route }) => {
   const [senderName, setSenderName] = useState('');
 
   const currentUser = auth().currentUser;
-
   const conversationId = [currentUser.uid, receiverUid].sort().join('_');
 
-  
   useEffect(() => {
     firestore()
       .collection('users')
@@ -29,7 +27,6 @@ const ChatScreen = ({ route }) => {
       })
       .catch(() => setSenderName(currentUser.email));
   }, []);
-
   
   useEffect(() => {
     const unsubscribe = firestore()
@@ -55,12 +52,12 @@ const ChatScreen = ({ route }) => {
   async (messageArray = []) => {
     const msg = messageArray[0];
 
-    if (!msg) return; // guard
+    if (!msg) return; 
 
     const myMsg = {
-      _id: msg._id ? String(msg._id) : firestore().collection('_').doc().id, // generate ID if missing
+      _id: msg._id ? String(msg._id) : firestore().collection('_').doc().id, 
       text: msg.text ? String(msg.text) : '',
-      createdAt: firestore.FieldValue.serverTimestamp(), // use Firestore timestamp, not JS Date
+      createdAt: firestore.FieldValue.serverTimestamp(), 
       sentBy: currentUser.uid ? currentUser.uid : '',
       sentTo: receiverUid ? receiverUid : '',
       user: {
@@ -85,11 +82,11 @@ const ChatScreen = ({ route }) => {
   [conversationId, senderName],
 );
 
-
   return (
     <KeyboardAvoidingView
       style={styles.container}
-      behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+      keyboardVerticalOffset={Platform.OS === 'ios' ? 90 : 60}
     >
       <GiftedChat
         messages={messages}
@@ -102,6 +99,8 @@ const ChatScreen = ({ route }) => {
         placeholder="Type a message..."
         scrollToBottom
         showUserAvatar={false}
+        KeyboardShouldPersistTaps='never'
+
       />
     </KeyboardAvoidingView>
   );

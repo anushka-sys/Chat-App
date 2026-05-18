@@ -46,7 +46,7 @@ const HomeScreen = () => {
     >
       <View style={styles.userInfo}>
         <View style={styles.userImgWrapper}>
-          {/* Placeholder avatar using first letter of email */}
+          
           <View style={styles.avatarCircle}>
             <Text style={styles.avatarText}>
               {item.name?.charAt(0).toUpperCase()}

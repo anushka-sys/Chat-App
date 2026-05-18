@@ -1,7 +1,9 @@
-import { StyleSheet, Text, View, Image, TouchableOpacity } from 'react-native';
+import { StyleSheet, Text, View, Image, TouchableOpacity, Dimensions } from 'react-native';
 import React from 'react';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
+
+const { height } = Dimensions.get('window');
 
 const Splash = () => {
   const navigation = useNavigation();
@@ -49,46 +51,45 @@ const styles = StyleSheet.create({
   },
 
   topSection: {
-    flex: 3,
+    flex: 1, 
     justifyContent: 'center',
     alignItems: 'center',
-    paddingTop: 40,
+    paddingTop: 20,
   },
 
   image: {
-    // height:620,
     width: '80%',
+    height: height * 0.38, 
     resizeMode: 'contain',
-    paddingTop: 20,
-    //aspectRatio:1,
+    flexShrink: 1, 
   },
 
   bottomSection: {
-    flex: 2,
+    flex: 1, 
     paddingHorizontal: 24,
-    // paddingBottom:100,
-    justifyContent: 'flex-end',
+    justifyContent: 'space-between', 
+    paddingTop: 16,
+    paddingBottom: 40, 
   },
 
   textBlock: {
     width: '100%',
     alignItems: 'center',
-    paddingBottom: 100,
+   
   },
 
   title: {
     textAlign: 'center',
-    fontSize: 28,
+    fontSize: 26,
     fontWeight: '600',
     color: '#0F1828',
-    paddingBottom: 20,
   },
 
   terms: {
     fontSize: 12,
     fontWeight: '500',
     color: '#162030',
-    paddingBottom: 30,
+    textAlign: 'center',
   },
 
   btncontainer: {
@@ -96,18 +97,20 @@ const styles = StyleSheet.create({
     borderRadius: 30,
     backgroundColor: '#002DE3',
     paddingVertical: 14,
-    // paddingHorizontal:80,
     alignItems: 'center',
   },
+
   buttontxt: {
     color: 'white',
     fontSize: 18,
     fontWeight: '500',
   },
+
   termscon: {
     alignItems: 'center',
   },
+
   btn: {
-    paddingBottom: 60,
+    
   },
 });
