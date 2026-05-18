@@ -35,19 +35,19 @@ const HomeScreen = () => {
       onPress={() => navigation.navigate('Chat', { receiverUid : item.uid,
         receiverName:item.name,
        })}
-      activeOpacity={0.7}
+     
     >
       <View style={styles.userInfo}>
         <View style={styles.userImgWrapper}>
           {/* Placeholder avatar using first letter of email */}
           <View style={styles.avatarCircle}>
             <Text style={styles.avatarText}>
-              {item.email?.charAt(0).toUpperCase()}
+              {item.userName?.charAt(0).toUpperCase()}
             </Text>
           </View>
         </View>
         <View style={styles.textSection}>
-          <Text style={styles.userName}>{item.email}</Text>
+          <Text style={styles.userName}>{item.name}</Text>
           <Text style={styles.messageText}>Tap to chat</Text>
         </View>
       </View>
