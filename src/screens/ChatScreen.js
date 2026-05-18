@@ -30,12 +30,12 @@ const ChatScreen = ({ route }) => {
       .catch(() => setSenderName(currentUser.email));
   }, []);
 
-  // Listen only to THIS private conversation
+  
   useEffect(() => {
     const unsubscribe = firestore()
-      .collection('conversations') // New top-level collection
+      .collection('conversations') 
       .doc(conversationId)
-      .collection('messages') // Sub-collection of messages
+      .collection('messages') 
       .orderBy('createdAt', 'desc')
       .onSnapshot(snapshot => {
         const msgs = snapshot.docs.map(doc => {
@@ -69,7 +69,6 @@ const ChatScreen = ({ route }) => {
       },
     };
 
-    // Optimistic UI — use JS date locally since serverTimestamp is null until synced
     const localMsg = { ...myMsg, createdAt: new Date() };
     setMessages(prev => GiftedChat.append(prev, [localMsg]));
 

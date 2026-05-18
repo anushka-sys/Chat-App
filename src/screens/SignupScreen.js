@@ -1,6 +1,10 @@
 import {
-  StyleSheet, Text, TextInput,
-  TouchableOpacity, View, Alert,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
+  Alert,
 } from 'react-native';
 import React, { useState } from 'react';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -21,7 +25,7 @@ const SignupScreen = () => {
 
   const registerUser = async () => {
     // Basic validation
-    if (!name ||!email || !pass || !confirmPass) {
+    if (!name || !email || !pass || !confirmPass) {
       Alert.alert('Error', 'Please fill all fields');
       return;
     }
@@ -36,22 +40,20 @@ const SignupScreen = () => {
 
     setLoading(true);
     try {
-      // Firebase Auth creates the user securely — NO plain text password stored!
       const userCredential = await auth().createUserWithEmailAndPassword(
         email.trim(),
-        pass
+        pass,
       );
 
       const uid = userCredential.user.uid;
 
-      // Save user profile in Firestore (email only, NO password)
       await firestore().collection('users').doc(uid).set({
         uid: uid,
         email: email.trim(),
         name: name.trim(),
         createdAt: firestore.FieldValue.serverTimestamp(),
       });
-      
+
       await auth().signOut();
 
       Alert.alert('Success', 'Account created! Please login.');
@@ -143,16 +145,64 @@ const SignupScreen = () => {
 
 export default SignupScreen;
 
-// Keep your existing styles from SignupScreen.js — they're fine
 const styles = StyleSheet.create({
-  safe: { flex: 1, backgroundColor: '#FFFFFF' },
-  container: { flex: 1, alignItems: 'center', paddingHorizontal: 24, paddingTop: 48 },
-  title: { fontSize: 26, fontWeight: '700', color: '#002DE3', marginBottom: 10, textAlign: 'center' },
-  subtitle: { fontSize: 14, color: '#4A4A4A', textAlign: 'center', lineHeight: 20, marginBottom: 36, paddingHorizontal: 16 },
-  inputWrap: { width: '90%', borderWidth: 1.5, borderColor: '#D0D5E8', borderRadius: 8, marginBottom: 16, backgroundColor: '#FFFFFF' },
-  input: { paddingVertical: 14, paddingHorizontal: 16, fontSize: 15, color: '#1A1A1A' },
-  buttoncontainer: { width: '90%', backgroundColor: '#002DE3', borderRadius: 30, paddingVertical: 15, alignItems: 'center', marginTop: 20 },
-  buttonText: { color: '#FFFFFF', fontSize: 16, fontWeight: '600', letterSpacing: 0.5 },
-  loginLink: { paddingTop: 18, paddingBottom: 28 },
-  loginText: { color: '#4A4A4A', fontSize: 14 },
+  safe: {
+    flex: 1,
+    backgroundColor: '#FFFFFF',
+  },
+  container: {
+    flex: 1,
+    alignItems: 'center',
+    paddingHorizontal: 24,
+    paddingTop: 48,
+  },
+  title: {
+    fontSize: 26,
+    fontWeight: '700',
+    color: '#002DE3',
+    marginBottom: 10,
+    textAlign: 'center',
+  },
+  subtitle: {
+    fontSize: 14,
+    color: '#4A4A4A',
+    textAlign: 'center',
+    marginBottom: 36,
+    paddingHorizontal: 16,
+  },
+  inputWrap: {
+    width: '90%',
+    borderWidth: 1.5,
+    borderColor: '#D0D5E8',
+    borderRadius: 8,
+    marginBottom: 16,
+    backgroundColor: '#FFFFFF',
+  },
+  input: {
+    paddingVertical: 14,
+    paddingHorizontal: 16,
+    fontSize: 15,
+    color: '#1A1A1A',
+  },
+  buttoncontainer: {
+    width: '90%',
+    backgroundColor: '#002DE3',
+    borderRadius: 30,
+    paddingVertical: 15,
+    alignItems: 'center',
+    marginTop: 20,
+  },
+  buttonText: {
+    color: '#FFFFFF',
+    fontSize: 16,
+    fontWeight: '600',
+  },
+  loginLink: {
+    paddingTop: 18,
+    paddingBottom: 28,
+  },
+  loginText: {
+    color: '#4A4A4A',
+    fontSize: 14,
+  },
 });

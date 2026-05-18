@@ -1,7 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import {
-  View, Text, FlatList, TouchableOpacity,
-  Image, StyleSheet, ActivityIndicator,
+  View,
+  Text,
+  FlatList,
+  TouchableOpacity,
+  Image,
+  StyleSheet,
+  ActivityIndicator,
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -15,13 +20,13 @@ const HomeScreen = () => {
   const currentUid = auth().currentUser?.uid;
 
   useEffect(() => {
-    // Load all users EXCEPT yourself
+    
     const unsubscribe = firestore()
       .collection('users')
       .onSnapshot(snapshot => {
         const allUsers = snapshot.docs
           .map(doc => doc.data())
-          .filter(u => u.uid !== currentUid); // hide yourself
+          .filter(u => u.uid !== currentUid); 
         setUsers(allUsers);
         setLoading(false);
       });
@@ -32,22 +37,24 @@ const HomeScreen = () => {
   const renderItem = ({ item }) => (
     <TouchableOpacity
       style={styles.card}
-      onPress={() => navigation.navigate('Chat', { receiverUid : item.uid,
-        receiverName:item.name,
-       })}
-     
+      onPress={() =>
+        navigation.navigate('Chat', {
+          receiverUid: item.uid,
+          receiverName: item.name,
+        })
+      }
     >
       <View style={styles.userInfo}>
         <View style={styles.userImgWrapper}>
           {/* Placeholder avatar using first letter of email */}
           <View style={styles.avatarCircle}>
             <Text style={styles.avatarText}>
-              {item.userName?.charAt(0).toUpperCase()}
+              {item.name?.charAt(0).toUpperCase()}
             </Text>
           </View>
         </View>
         <View style={styles.textSection}>
-          <Text style={styles.userName}>{item.name || item.email}</Text>
+          <Text style={styles.userName}>{item.name}</Text>
           <Text style={styles.messageText}>Tap to chat</Text>
         </View>
       </View>
@@ -61,7 +68,7 @@ const HomeScreen = () => {
       </View>
     );
   }
-console.log('user data:', JSON.stringify(users[0]));
+
   return (
     <SafeAreaView style={styles.container}>
       <FlatList
@@ -79,17 +86,51 @@ console.log('user data:', JSON.stringify(users[0]));
   );
 };
 
-// Keep your existing styles, add these new ones:
+
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#fff' },
-  card: { paddingHorizontal: 16, paddingVertical: 12, borderBottomWidth: StyleSheet.hairlineWidth, borderBottomColor: '#e5e5e5' },
-  userInfo: { flexDirection: 'row', alignItems: 'center' },
-  userImgWrapper: { marginRight: 12 },
-  avatarCircle: { width: 50, height: 50, borderRadius: 25, backgroundColor: '#002DE3', justifyContent: 'center', alignItems: 'center' },
-  avatarText: { color: '#fff', fontSize: 20, fontWeight: '700' },
-  textSection: { flex: 1 },
-  userName: { fontSize: 15, fontWeight: '600', color: '#1a1a1a' },
-  messageText: { fontSize: 14, color: '#666', marginTop: 2 },
+  container: {
+    flex: 1,
+    backgroundColor: '#fff',
+  },
+  card: {
+    paddingHorizontal: 16,
+   // paddingVertical: 12,
+    borderBottomColor: '#e5e5e5',
+    paddingTop:0,
+  },
+  userInfo: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  userImgWrapper: {
+    paddingRight: 12,
+  },
+  avatarCircle: {
+    width: 50,
+    height: 50,
+    borderRadius: 25,
+    backgroundColor: '#002DE3',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  avatarText: {
+    color: '#fff',
+    fontSize: 20,
+    fontWeight: '700',
+  },
+  textSection: {
+    flex: 1,
+  },
+  userName: {
+    fontSize: 15,
+    fontWeight: '600',
+    color: '#1a1a1a',
+  },
+  messageText: {
+    fontSize: 14,
+    color: '#666',
+    marginTop: 2,
+  },
 });
 
 export default HomeScreen;
