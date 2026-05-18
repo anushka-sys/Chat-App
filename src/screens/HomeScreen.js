@@ -32,7 +32,9 @@ const HomeScreen = () => {
   const renderItem = ({ item }) => (
     <TouchableOpacity
       style={styles.card}
-      onPress={() => navigation.navigate('Chat', { userId: item.uid })}
+      onPress={() => navigation.navigate('Chat', { receiverUid : item.uid,
+        receiverName:item.name,
+       })}
       activeOpacity={0.7}
     >
       <View style={styles.userInfo}>

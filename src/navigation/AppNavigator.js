@@ -1,7 +1,8 @@
-import React from 'react';
+import React,{useEffect,useState} from 'react';
 import { createStackNavigator } from '@react-navigation/stack';
 import { NavigationContainer } from '@react-navigation/native';
-
+import {View,ActivityIndicator} from 'react-native'
+import auth from '@react-native-firebase/auth'
 import Splash from '../screens/Splash';
 import SignupScreen from '../screens/SignupScreen';
 import LoginScreen from '../screens/LoginScreen';
@@ -11,6 +12,23 @@ import ChatScreen from '../screens/ChatScreen';
 const Stack = createStackNavigator();
 
 const AppNavigator = () => {
+  const [users, setUsers] = useState(null);
+  const [loading,setLoading] = useState(true)
+
+  useEffect(()=>{
+    const unsubscribe = auth.onAuthStateChanged(currentUser =>{
+      setUsers(currentUser);
+      setLoading(false);
+    });
+    return unsubscribe
+  })
+  if(loading){
+    return(
+      <View>
+        <ActivityIndicator size={'large'} />
+      </View>
+    )
+  }
   return (
     <NavigationContainer>
       <Stack.Navigator

@@ -5,7 +5,6 @@ import auth from '@react-native-firebase/auth';
 import firestore from '@react-native-firebase/firestore';
 
 const ChatScreen = ({ route }) => {
-  // Pass receiverUid + receiverName when navigating to this screen
   const { receiverUid, receiverName } = route.params;
 
   const [messages, setMessages] = useState([]);
@@ -13,10 +12,9 @@ const ChatScreen = ({ route }) => {
 
   const currentUser = auth().currentUser;
 
-  // Create a stable, shared conversation ID for these two users
   const conversationId = [currentUser.uid, receiverUid].sort().join('_');
 
-  // Fetch the current user's name from Firestore
+  
   useEffect(() => {
     firestore()
       .collection('users')
@@ -54,30 +52,40 @@ const ChatScreen = ({ route }) => {
   }, [conversationId]);
 
   const onSend = useCallback(
-    async (messageArray = []) => {
-      const msg = messageArray[0];
-      const myMsg = {
-        _id: msg._id,
-        text: msg.text || '',
-        createdAt: new Date(),
-        sentBy: currentUser.uid,
-        sentTo: receiverUid,
-        user: {
-          _id: currentUser.uid,
-          name: senderName || currentUser.email || 'User', // Show name, fallback to email
-        },
-      };
+  async (messageArray = []) => {
+    const msg = messageArray[0];
 
-      setMessages(prev => GiftedChat.append(prev, [myMsg]));
+    if (!msg) return; // guard
 
+    const myMsg = {
+      _id: msg._id ? String(msg._id) : firestore().collection('_').doc().id, // generate ID if missing
+      text: msg.text ? String(msg.text) : '',
+      createdAt: firestore.FieldValue.serverTimestamp(), // use Firestore timestamp, not JS Date
+      sentBy: currentUser.uid ? currentUser.uid : '',
+      sentTo: receiverUid ? receiverUid : '',
+      user: {
+        _id: currentUser.uid ? currentUser.uid : '',
+        name: senderName ? senderName : (currentUser.email ? currentUser.email : 'User'),
+      },
+    };
+
+    // Optimistic UI — use JS date locally since serverTimestamp is null until synced
+    const localMsg = { ...myMsg, createdAt: new Date() };
+    setMessages(prev => GiftedChat.append(prev, [localMsg]));
+
+    try {
       await firestore()
         .collection('conversations')
         .doc(conversationId)
         .collection('messages')
         .add(myMsg);
-    },
-    [conversationId, senderName],
-  );
+    } catch (e) {
+      console.log('Firestore send error:', e);
+    }
+  },
+  [conversationId, senderName],
+);
+
 
   return (
     <KeyboardAvoidingView
