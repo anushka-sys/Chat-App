@@ -23,7 +23,7 @@ const TabNavigator = () => {
           left: 0,
           right: 0,
 
-          height: 70,
+          height: 50,
 
           borderTopLeftRadius: 25,
           borderTopRightRadius: 25,
@@ -46,7 +46,7 @@ const TabNavigator = () => {
       })}
     >
       <Tab.Screen name="Chats" component={HomeScreen} />
-      <Tab.Screen name="Profile" component={ProfileScreen} />
+      <Tab.Screen name="Profile" component={ProfileScreen}  options={{ headerShown: false }}/>
       <Tab.Screen name="Settings" component={SettingScreen} />
     </Tab.Navigator>
   );

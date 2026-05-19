@@ -1,7 +1,7 @@
 import React from 'react';
 import { createStackNavigator } from '@react-navigation/stack';
 import { NavigationContainer } from '@react-navigation/native';
-
+import { View, Text, Image } from 'react-native';
 import Splash from '../screens/Splash';
 import SignupScreen from '../screens/SignupScreen';
 import LoginScreen from '../screens/LoginScreen';
@@ -13,43 +13,75 @@ const Stack = createStackNavigator();
 const AppNavigator = () => {
   return (
     <NavigationContainer>
-
       <Stack.Navigator
         initialRouteName="Splash"
         screenOptions={{ headerShown: false }}
       >
+        <Stack.Screen name="Splash" component={Splash} />
+
+        <Stack.Screen name="Signup" component={SignupScreen} />
+
+        <Stack.Screen name="Login" component={LoginScreen} />
+
+        <Stack.Screen name="Main" component={TabNavigator} />
 
         <Stack.Screen
-          name="Splash"
-          component={Splash}
-        />
-        
-        <Stack.Screen
-          name="Signup"
-          component={SignupScreen}
-        />
+  name="Chat"
+  component={ChatScreen}
+  options={({ route }) => ({
 
-        <Stack.Screen
-          name="Login"
-          component={LoginScreen}
-        />
+    headerShown: true,
 
-        <Stack.Screen
-          name="Main"
-          component={TabNavigator}
-        />
+    headerTitle: () => (
 
-        <Stack.Screen
-          name="Chat"
-          component={ChatScreen}
-          options={{
-            headerShown: true,
-            title: 'Messages',
+      <View
+        style={{
+          flexDirection: 'row',
+          alignItems: 'center',
+        }}
+      >
+
+        <View
+          style={{
+            width: 40,
+            height: 40,
+            borderRadius: 20,
+            backgroundColor: '#002DE3',
+            justifyContent: 'center',
+            alignItems: 'center',
+            marginRight: 12,
           }}
-        />
+        >
 
+          <Text
+            style={{
+              color: '#fff',
+              fontSize: 16,
+              fontWeight: '700',
+            }}
+          >
+            {route.params?.receiverName?.charAt(0).toUpperCase()}
+          </Text>
+
+        </View>
+
+        <Text
+          style={{
+            fontSize: 18,
+            fontWeight: '600',
+            color: '#000',
+          }}
+        >
+          {route.params?.receiverName}
+        </Text>
+
+      </View>
+
+    ),
+
+  })}
+/>
       </Stack.Navigator>
-
     </NavigationContainer>
   );
 };

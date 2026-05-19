@@ -1,12 +1,46 @@
-import { StyleSheet, Text, View, Image, TouchableOpacity, Dimensions } from 'react-native';
-import React from 'react';
+import {
+  StyleSheet,
+  Text,
+  View,
+  Image,
+  TouchableOpacity,
+  Dimensions,
+} from 'react-native';
+import React, { useEffect, useState } from 'react';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
-
+import auth from '@react-native-firebase/auth';
 const { height } = Dimensions.get('window');
 
 const Splash = () => {
   const navigation = useNavigation();
+  const [checkingAuth, setCheckingAuth] = useState(true);
+
+  useEffect(() => {
+    const unsubscribe = auth().onAuthStateChanged(user => {
+      if (user) {
+        navigation.replace('Main');
+      } else {
+        setCheckingAuth(false);
+      }
+    });
+
+    return () => unsubscribe(); // cleanup listener
+  }, []);
+
+  // While checking auth state
+  if (checkingAuth) {
+    return (
+      <SafeAreaView style={styles.safe}>
+        <View style={styles.topSection}>
+          <Image
+            style={styles.image}
+            source={require('../assets/Illustration.png')}
+          />
+        </View>
+      </SafeAreaView>
+    );
+  }
 
   return (
     <SafeAreaView style={styles.safe}>
@@ -16,12 +50,12 @@ const Splash = () => {
           source={require('../assets/Illustration.png')}
         />
       </View>
-
       <View style={styles.bottomSection}>
         <View style={styles.textBlock}>
           <Text style={styles.title}>
-            Connect easily with{'\n'} your family and friends {'\n'}over
-            countries
+            Connect easily with{'\n'}
+            your family and friends {'\n'}
+            over countries
           </Text>
         </View>
 
@@ -51,7 +85,7 @@ const styles = StyleSheet.create({
   },
 
   topSection: {
-    flex: 1, 
+    flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
     paddingTop: 20,
@@ -59,23 +93,22 @@ const styles = StyleSheet.create({
 
   image: {
     width: '80%',
-    height: height * 0.38, 
+    height: height * 0.38,
     resizeMode: 'contain',
-    flexShrink: 1, 
+    flexShrink: 1,
   },
 
   bottomSection: {
-    flex: 1, 
+    flex: 1,
     paddingHorizontal: 24,
-    justifyContent: 'space-between', 
+    justifyContent: 'space-between',
     paddingTop: 16,
-    paddingBottom: 40, 
+    paddingBottom: 40,
   },
 
   textBlock: {
     width: '100%',
     alignItems: 'center',
-   
   },
 
   title: {

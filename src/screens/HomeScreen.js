@@ -17,16 +17,16 @@ const HomeScreen = () => {
   const navigation = useNavigation();
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
-  const currentUid = auth().currentUser?.uid;
+  const currentUid = auth().currentUser?.uid; //current user logged in 
 
   useEffect(() => {
     
     const unsubscribe = firestore()
-      .collection('users')
+      .collection('users')  //get users 
       .onSnapshot(snapshot => {
-        const allUsers = snapshot.docs
+        const allUsers = snapshot.docs //convert firestore docs to js arrays
           .map(doc => doc.data())
-          .filter(u => u.uid !== currentUid); 
+          .filter(u => u.uid !== currentUid); //remove current user
         setUsers(allUsers);
         setLoading(false);
       });
@@ -37,12 +37,13 @@ const HomeScreen = () => {
   const renderItem = ({ item }) => (
     <TouchableOpacity
       style={styles.card}
-      onPress={() =>
+      onPress={() => {
         navigation.navigate('Chat', {
-          receiverUid: item.uid,
-          receiverName: item.name,
-        })
-      }
+  receiverUid: item.uid,
+  receiverName: item.name,
+  receiverImage: item.image,
+});
+      }}
     >
       <View style={styles.userInfo}>
         <View style={styles.userImgWrapper}>
@@ -70,7 +71,7 @@ const HomeScreen = () => {
   }
 
   return (
-    <SafeAreaView style={styles.container}>
+    <View style={styles.container}>
       <FlatList
         data={users}
         keyExtractor={item => item.uid}
@@ -82,7 +83,7 @@ const HomeScreen = () => {
           </Text>
         }
       />
-    </SafeAreaView>
+    </View>
   );
 };
 
@@ -91,10 +92,11 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#fff',
+    paddingTop:10,
   },
   card: {
     paddingHorizontal: 16,
-   // paddingVertical: 12,
+    paddingVertical: 12,
     borderBottomColor: '#e5e5e5',
     paddingTop:0,
   },
