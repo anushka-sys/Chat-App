@@ -1,6 +1,8 @@
 import React, { useEffect, useState, useCallback } from 'react';
 import { View, Platform, StyleSheet, KeyboardAvoidingView } from 'react-native';
 import { GiftedChat, Bubble } from 'react-native-gifted-chat';
+import { InputToolbar, Composer, Send } from 'react-native-gifted-chat';
+import Icon from 'react-native-vector-icons/Ionicons';
 import { useHeaderHeight } from '@react-navigation/elements'; 
 import auth from '@react-native-firebase/auth';
 import firestore from '@react-native-firebase/firestore';
@@ -77,6 +79,64 @@ const ChatScreen = ({ route }) => {
     [conversationId, senderName],
   );
 
+  const renderInputToolbar = props => (
+  <InputToolbar
+    {...props}
+    containerStyle={{
+      backgroundColor: '#7a7a7a',
+      paddingTop: 6,
+      paddingBottom: 6,
+      paddingHorizontal: 8,
+      borderTopWidth: 0,
+      elevation: 10, // android shadow
+      shadowColor: '#000', // ios shadow
+      shadowOffset: { width: 0, height: -3 },
+      shadowOpacity: 0.08,
+      shadowRadius: 6,
+    }}
+    primaryStyle={{
+      alignItems: 'center',
+    }}
+  />
+);
+
+const renderComposer = props => (
+  <Composer
+    {...props}
+    textInputStyle={{
+      backgroundColor: '#595f69',
+      borderRadius: 25,
+      paddingHorizontal: 16,
+      marginLeft: 8,
+      marginRight: 8,
+      fontSize: 16,
+      lineHeight: 20,
+      maxHeight: 120,
+      minHeight: 44,
+    }}
+    placeholderTextColor="#888"
+  />
+);
+
+const renderSend = props => (
+  <Send {...props}>
+    <View
+      style={{
+        backgroundColor: '#002DE3',
+        width: 42,
+        height: 42,
+        borderRadius: 21,
+        justifyContent: 'center',
+        alignItems: 'center',
+        marginRight: 6,
+        marginBottom: 4,
+      }}
+    >
+      <Icon name="send" size={18} color="#fff" />
+    </View>
+  </Send>
+);
+
   return (
     <KeyboardAvoidingView
       style={styles.container}
@@ -90,6 +150,10 @@ const ChatScreen = ({ route }) => {
         placeholder="Type a message..."
         scrollToBottom
         showUserAvatar={false}
+        renderInputToolbar={renderInputToolbar}
+renderComposer={renderComposer}
+renderSend={renderSend}
+alwaysShowSend
         keyboardShouldPersistTaps="handled"
         bottomOffset={Platform.OS === 'ios' ? headerHeight : 0}
         renderBubble={props => (
