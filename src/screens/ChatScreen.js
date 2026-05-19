@@ -12,11 +12,11 @@ const ChatScreen = ({ route }) => {
   const headerHeight = useHeaderHeight(); 
 
   const currentUser = auth().currentUser; // current logged in user
-  const conversationId = [currentUser.uid, receiverUid].sort().join('_');
+  const conversationId = [currentUser.uid, receiverUid].sort().join('_'); //create chatroom id
 
   useEffect(() => {
     firestore()
-      .collection('users')
+      .collection('users')   //extract user name from the doc
       .doc(currentUser.uid)
       .get()
       .then(doc => {
@@ -27,7 +27,7 @@ const ChatScreen = ({ route }) => {
       .catch(() => setSenderName(currentUser.email));
   }, []);
 
-  useEffect(() => {
+  useEffect(() => {                 
     const unsubscribe = firestore()
       .collection('conversations')
       .doc(conversationId)
@@ -80,8 +80,8 @@ const ChatScreen = ({ route }) => {
   return (
     <KeyboardAvoidingView
       style={styles.container}
-      behavior={Platform.OS === 'ios' ? 'padding' : 'height'} // ← 'height' for Android
-      keyboardVerticalOffset={headerHeight} // ← precise offset
+      behavior={Platform.OS === 'ios' ? 'padding' : 'height'} 
+      keyboardVerticalOffset={headerHeight} 
     >
       <GiftedChat
         messages={messages}

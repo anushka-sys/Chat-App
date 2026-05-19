@@ -77,7 +77,7 @@ const ProfileScreen = () => {
       <TouchableOpacity
         style={styles.logoutButton}
         onPress={handleLogout}
-        activeOpacity={0.8}
+        
       >
         <Icon name="log-out-outline" size={20} color="#fff" style={styles.logoutIcon} />
         <Text style={styles.logoutText}>Logout</Text>

@@ -9,7 +9,6 @@ import {
   ActivityIndicator,
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
-import { SafeAreaView } from 'react-native-safe-area-context';
 import firestore from '@react-native-firebase/firestore';
 import auth from '@react-native-firebase/auth';
 
@@ -17,12 +16,11 @@ const HomeScreen = () => {
   const navigation = useNavigation();
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
-  const currentUid = auth().currentUser?.uid; //current user logged in 
+  const currentUid = auth().currentUser?.uid; //current user logged in
 
   useEffect(() => {
-    
     const unsubscribe = firestore()
-      .collection('users')  //get users 
+      .collection('users') //get users
       .onSnapshot(snapshot => {
         const allUsers = snapshot.docs //convert firestore docs to js arrays
           .map(doc => doc.data())
@@ -39,15 +37,14 @@ const HomeScreen = () => {
       style={styles.card}
       onPress={() => {
         navigation.navigate('Chat', {
-  receiverUid: item.uid,
-  receiverName: item.name,
-  receiverImage: item.image,
-});
+          receiverUid: item.uid,
+          receiverName: item.name,
+          receiverImage: item.image,
+        });
       }}
     >
       <View style={styles.userInfo}>
         <View style={styles.userImgWrapper}>
-          
           <View style={styles.avatarCircle}>
             <Text style={styles.avatarText}>
               {item.name?.charAt(0).toUpperCase()}
@@ -87,18 +84,17 @@ const HomeScreen = () => {
   );
 };
 
-
 const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#fff',
-    paddingTop:10,
+    paddingTop: 10,
   },
   card: {
     paddingHorizontal: 16,
     paddingVertical: 12,
     borderBottomColor: '#e5e5e5',
-    paddingTop:0,
+    paddingTop: 0,
   },
   userInfo: {
     flexDirection: 'row',

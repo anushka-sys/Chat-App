@@ -10,8 +10,7 @@ import React, { useState } from 'react';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
 import auth from '@react-native-firebase/auth';
-import firestore from '@react-native-firebase/firestore';
-
+import firestore from '@react-native-firebase/firestore'
 
 const SignupScreen = () => {
   const navigation = useNavigation();

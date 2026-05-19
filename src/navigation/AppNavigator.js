@@ -18,69 +18,58 @@ const AppNavigator = () => {
         screenOptions={{ headerShown: false }}
       >
         <Stack.Screen name="Splash" component={Splash} />
-
         <Stack.Screen name="Signup" component={SignupScreen} />
-
         <Stack.Screen name="Login" component={LoginScreen} />
-
         <Stack.Screen name="Main" component={TabNavigator} />
 
         <Stack.Screen
-  name="Chat"
-  component={ChatScreen}
-  options={({ route }) => ({
+          name="Chat"
+          component={ChatScreen}
+          options={({ route }) => ({
+            headerShown: true,
 
-    headerShown: true,
+            headerTitle: () => (
+              <View
+                style={{
+                  flexDirection: 'row',
+                  alignItems: 'center',
+                }}
+              >
+                <View
+                  style={{
+                    width: 40,
+                    height: 40,
+                    borderRadius: 20,
+                    backgroundColor: '#002DE3',
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                    marginRight: 12,
+                  }}
+                >
+                  <Text
+                    style={{
+                      color: '#fff',
+                      fontSize: 16,
+                      fontWeight: '700',
+                    }}
+                  >
+                    {route.params?.receiverName?.charAt(0).toUpperCase()}
+                  </Text>
+                </View>
 
-    headerTitle: () => (
-
-      <View
-        style={{
-          flexDirection: 'row',
-          alignItems: 'center',
-        }}
-      >
-
-        <View
-          style={{
-            width: 40,
-            height: 40,
-            borderRadius: 20,
-            backgroundColor: '#002DE3',
-            justifyContent: 'center',
-            alignItems: 'center',
-            marginRight: 12,
-          }}
-        >
-
-          <Text
-            style={{
-              color: '#fff',
-              fontSize: 16,
-              fontWeight: '700',
-            }}
-          >
-            {route.params?.receiverName?.charAt(0).toUpperCase()}
-          </Text>
-
-        </View>
-
-        <Text
-          style={{
-            fontSize: 18,
-            fontWeight: '600',
-            color: '#000',
-          }}
-        >
-          {route.params?.receiverName}
-        </Text>
-
-      </View>
-
-    ),
-
-  })}
-/>
+                <Text
+                  style={{
+                    fontSize: 18,
+                    fontWeight: '600',
+                    color: '#000',
+                  }}
+                >
+                  {route.params?.receiverName}
+                </Text>
+              </View>
+            ),
+          })}
+        />
       </Stack.Navigator>
     </NavigationContainer>
   );
