@@ -11,12 +11,16 @@ import {
 import { useNavigation } from '@react-navigation/native';
 import firestore from '@react-native-firebase/firestore';
 import auth from '@react-native-firebase/auth';
+import SearchBar from '../components/SearchBar'
+
 
 const HomeScreen = () => {
   const navigation = useNavigation();
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [searchQuery, setsearchQuery] = useState('')
   const currentUid = auth().currentUser?.uid; //current user logged in
+
 
   useEffect(() => {
     const unsubscribe = firestore()
@@ -31,6 +35,10 @@ const HomeScreen = () => {
 
     return () => unsubscribe();
   }, []);
+
+  const filteredUsers = users.filter(u =>
+    u.name?.toLowerCase().includes(searchQuery.toLowerCase())
+  );
 
   const renderItem = ({ item }) => (
     <TouchableOpacity
@@ -69,8 +77,9 @@ const HomeScreen = () => {
 
   return (
     <View style={styles.container}>
+      <SearchBar value={searchQuery} onChangeText={setsearchQuery}/>
       <FlatList
-        data={users}
+        data={filteredUsers}
         keyExtractor={item => item.uid}
         renderItem={renderItem}
         showsVerticalScrollIndicator={false}
@@ -104,9 +113,9 @@ const styles = StyleSheet.create({
     paddingRight: 12,
   },
   avatarCircle: {
-    width: 50,
-    height: 50,
-    borderRadius: 25,
+    width: 60,
+    height: 60,
+    borderRadius: 10,
     backgroundColor: '#002DE3',
     justifyContent: 'center',
     alignItems: 'center',
