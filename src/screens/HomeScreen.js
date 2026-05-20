@@ -7,28 +7,28 @@ import {
   Image,
   StyleSheet,
   ActivityIndicator,
+  StatusBar
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import firestore from '@react-native-firebase/firestore';
 import auth from '@react-native-firebase/auth';
-import SearchBar from '../components/SearchBar'
-
+import SearchBar from '../components/SearchBar';
 
 const HomeScreen = () => {
   const navigation = useNavigation();
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [searchQuery, setsearchQuery] = useState('')
-  const currentUid = auth().currentUser?.uid; //current user logged in
-
+  const [searchQuery, setsearchQuery] = useState('');
+  const currentUid = auth().currentUser?.uid;
 
   useEffect(() => {
     const unsubscribe = firestore()
-      .collection('users') //get users
+      .collection('users')
       .onSnapshot(snapshot => {
-        const allUsers = snapshot.docs //convert firestore docs to js arrays
+        const allUsers = snapshot.docs
           .map(doc => doc.data())
-          .filter(u => u.uid !== currentUid); //remove current user
+          .filter(u => u.uid !== currentUid);
+
         setUsers(allUsers);
         setLoading(false);
       });
@@ -42,34 +42,42 @@ const HomeScreen = () => {
 
   const renderItem = ({ item }) => (
     <TouchableOpacity
-      style={styles.card}
-      onPress={() => {
+      style={styles.userRow}
+      onPress={() =>
         navigation.navigate('Chat', {
           receiverUid: item.uid,
           receiverName: item.name,
           receiverImage: item.image,
-        });
-      }}
+        })
+      }
     >
-      <View style={styles.userInfo}>
-        <View style={styles.userImgWrapper}>
-          <View style={styles.avatarCircle}>
+      {/* Avatar */}
+      <View style={styles.avatarWrapper}>
+        {item.image ? (
+          <Image source={{ uri: item.image }} style={styles.avatarImg} />
+        ) : (
+          <View style={styles.avatarPlaceholder}>
             <Text style={styles.avatarText}>
               {item.name?.charAt(0).toUpperCase()}
             </Text>
           </View>
-        </View>
-        <View style={styles.textSection}>
-          <Text style={styles.userName}>{item.name}</Text>
-          <Text style={styles.messageText}>Tap to chat</Text>
-        </View>
+        )}
+
+        {/* Online indicator placeholder */}
+        <View style={styles.onlineDot} />
+      </View>
+
+      {/* Name + subtitle */}
+      <View style={styles.textWrapper}>
+        <Text style={styles.userName}>{item.name}</Text>
+        <Text style={styles.subtitle}>Tap to chat</Text>
       </View>
     </TouchableOpacity>
   );
 
   if (loading) {
     return (
-      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+      <View style={styles.loader}>
         <ActivityIndicator size="large" color="#002DE3" />
       </View>
     );
@@ -77,15 +85,30 @@ const HomeScreen = () => {
 
   return (
     <View style={styles.container}>
-      <SearchBar value={searchQuery} onChangeText={setsearchQuery}/>
+      <StatusBar barStyle="dark-content" />
+
+      {/* HEADER */}
+      <View style={styles.header}>
+        <Text style={styles.headerTitle}>Contacts</Text>
+
+        <TouchableOpacity style={styles.addBtn}>
+          <Text style={styles.addIcon}>＋</Text>
+        </TouchableOpacity>
+      </View>
+
+      {/* SEARCH */}
+      <SearchBar value={searchQuery} onChangeText={setsearchQuery} />
+
+      {/* LIST */}
       <FlatList
         data={filteredUsers}
         keyExtractor={item => item.uid}
         renderItem={renderItem}
         showsVerticalScrollIndicator={false}
+        contentContainerStyle={{ paddingTop: 10 }}
         ListEmptyComponent={
-          <Text style={{ textAlign: 'center', marginTop: 40, color: '#999' }}>
-            No other users found. Ask a friend to sign up!
+          <Text style={styles.emptyText}>
+            No other users found
           </Text>
         }
       />
@@ -93,51 +116,116 @@ const HomeScreen = () => {
   );
 };
 
+export default HomeScreen;
 const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#fff',
     paddingTop: 10,
   },
-  card: {
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    borderBottomColor: '#e5e5e5',
-    paddingTop: 0,
-  },
-  userInfo: {
-    flexDirection: 'row',
+
+  loader: {
+    flex: 1,
+    justifyContent: 'center',
     alignItems: 'center',
   },
-  userImgWrapper: {
-    paddingRight: 12,
+
+  /* HEADER */
+
+  header: {
+    paddingHorizontal: 20,
+   // marginBottom: 10,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
   },
-  avatarCircle: {
-    width: 60,
-    height: 60,
-    borderRadius: 10,
+
+  headerTitle: {
+    fontSize: 23,
+    fontWeight: '500',
+    color: '#000',
+  },
+
+  addBtn: {
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+
+  addIcon: {
+    fontSize: 20,
+    color: '#000000',
+    fontWeight: '600',
+  },
+
+  /* USER ROW */
+
+  userRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 20,
+    paddingVertical: 14,
+  },
+
+  avatarWrapper: {
+    position: 'relative',
+  },
+
+  avatarImg: {
+    width: 58,
+    height: 58,
+    borderRadius: 16,
+  },
+
+  avatarPlaceholder: {
+    width: 58,
+    height: 58,
+    borderRadius: 16,
     backgroundColor: '#002DE3',
     justifyContent: 'center',
     alignItems: 'center',
   },
+
   avatarText: {
     color: '#fff',
     fontSize: 20,
     fontWeight: '700',
   },
-  textSection: {
+
+  // onlineDot: {
+  //   position: 'absolute',
+  //   bottom: 2,
+  //   right: 2,
+  //   width: 14,
+  //   height: 14,
+  //   borderRadius: 7,
+  //   backgroundColor: '#22C55E',
+  //   borderWidth: 2,
+  //   borderColor: '#fff',
+  // },
+
+  textWrapper: {
+    marginLeft: 14,
     flex: 1,
   },
+
   userName: {
-    fontSize: 15,
+    fontSize: 16,
     fontWeight: '600',
-    color: '#1a1a1a',
+    color: '#000',
   },
-  messageText: {
-    fontSize: 14,
-    color: '#666',
-    marginTop: 2,
+
+  subtitle: {
+    marginTop: 4,
+    fontSize: 13,
+    color: '#8E8E93',
+  },
+
+  emptyText: {
+    textAlign: 'center',
+    marginTop: 40,
+    color: '#999',
   },
 });
-
-export default HomeScreen;

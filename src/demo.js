@@ -1,253 +1,233 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
   FlatList,
-  TextInput,
   TouchableOpacity,
-  Platform,
+  Image,
   StyleSheet,
-  KeyboardAvoidingView,
+  ActivityIndicator,
+  StatusBar
 } from 'react-native';
-import Icon from 'react-native-vector-icons/Ionicons';
-import { useHeaderHeight } from '@react-navigation/elements';
-import auth from '@react-native-firebase/auth';
+import { useNavigation } from '@react-navigation/native';
 import firestore from '@react-native-firebase/firestore';
+import auth from '@react-native-firebase/auth';
+import SearchBar from '../components/SearchBar';
 
-const ChatScreen = ({ route }) => {
-  const { receiverUid } = route.params;
-  const [messages, setMessages] = useState([]);
-  const [senderName, setSenderName] = useState('');
-  const [inputText, setInputText] = useState('');
-
-  const headerHeight = useHeaderHeight();
-  const currentUser = auth().currentUser;
-  const conversationId = [currentUser.uid, receiverUid].sort().join('_');
-
-  useEffect(() => {
-    firestore()
-      .collection('users')
-      .doc(currentUser.uid)
-      .get()
-      .then(doc => {
-        if (doc.exists) {
-          setSenderName(doc.data().name || currentUser.email);
-        } else {
-          setSenderName(currentUser.email);
-        }
-      })
-      .catch(() => setSenderName(currentUser.email));
-  }, []);
+const HomeScreen = () => {
+  const navigation = useNavigation();
+  const [users, setUsers] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [searchQuery, setsearchQuery] = useState('');
+  const currentUid = auth().currentUser?.uid;
 
   useEffect(() => {
     const unsubscribe = firestore()
-      .collection('conversations')
-      .doc(conversationId)
-      .collection('messages')
-      .orderBy('createdAt', 'desc')
+      .collection('users')
       .onSnapshot(snapshot => {
-        const msgs = snapshot.docs.map(doc => {
-          const data = doc.data();
-          return {
-            ...data,
-            createdAt: data.createdAt?.toDate(),
-          };
-        });
-        setMessages(msgs);
+        const allUsers = snapshot.docs
+          .map(doc => doc.data())
+          .filter(u => u.uid !== currentUid);
+
+        setUsers(allUsers);
+        setLoading(false);
       });
 
-    return unsubscribe;
-  }, [conversationId]);
+    return () => unsubscribe();
+  }, []);
 
-  function formatTime(date) {
-    if (!date) return '';
-    return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-  }
+  const filteredUsers = users.filter(u =>
+    u.name?.toLowerCase().includes(searchQuery.toLowerCase())
+  );
 
-  async function onSend() {
-    const text = inputText.trim();
-    if (!text) return;
+  const renderItem = ({ item }) => (
+    <TouchableOpacity
+      style={styles.userRow}
+      onPress={() =>
+        navigation.navigate('Chat', {
+          receiverUid: item.uid,
+          receiverName: item.name,
+          receiverImage: item.image,
+        })
+      }
+    >
+      {/* Avatar */}
+      <View style={styles.avatarWrapper}>
+        {item.image ? (
+          <Image source={{ uri: item.image }} style={styles.avatarImg} />
+        ) : (
+          <View style={styles.avatarPlaceholder}>
+            <Text style={styles.avatarText}>
+              {item.name?.charAt(0).toUpperCase()}
+            </Text>
+          </View>
+        )}
 
-    setInputText('');
+        {/* Online indicator placeholder */}
+        <View style={styles.onlineDot} />
+      </View>
 
-    const newMessage = {
-      _id: firestore().collection('_').doc().id,
-      text: text,
-      createdAt: firestore.FieldValue.serverTimestamp(),
-      sentBy: currentUser.uid,
-      sentTo: receiverUid,
-      user: {
-        _id: currentUser.uid,
-        name: senderName || currentUser.email,
-      },
-    };
+      {/* Name + subtitle */}
+      <View style={styles.textWrapper}>
+        <Text style={styles.userName}>{item.name}</Text>
+        <Text style={styles.subtitle}>Tap to chat</Text>
+      </View>
+    </TouchableOpacity>
+  );
 
-    setMessages(prev => [{ ...newMessage, createdAt: new Date() }, ...prev]);
-
-    try {
-      await firestore()
-        .collection('conversations')
-        .doc(conversationId)
-        .collection('messages')
-        .add(newMessage);
-    } catch (e) {
-      console.log('Send error:', e);
-    }
-  }
-
-  function renderMessage({ item }) {
-    const isMe = item.user?._id === currentUser.uid;
-
+  if (loading) {
     return (
-      <View style={[styles.messageRow, isMe ? styles.rowRight : styles.rowLeft]}>
-        <View style={[styles.bubble, isMe ? styles.bubbleRight : styles.bubbleLeft]}>
-          <Text style={[styles.messageText, isMe ? styles.textRight : styles.textLeft]}>
-            {item.text}
-          </Text>
-          <Text style={[styles.timeText, isMe ? styles.timeRight : styles.timeLeft]}>
-            {formatTime(item.createdAt)}
-          </Text>
-        </View>
+      <View style={styles.loader}>
+        <ActivityIndicator size="large" color="#002DE3" />
       </View>
     );
   }
 
   return (
-    <KeyboardAvoidingView
-      style={styles.container}
-      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-      keyboardVerticalOffset={headerHeight}
-    >
-      <FlatList
-        data={messages}
-        keyExtractor={item => item._id}
-        renderItem={renderMessage}
-        inverted
-        contentContainerStyle={styles.listContent}
-        keyboardShouldPersistTaps="handled"
-      />
+    <View style={styles.container}>
+      <StatusBar barStyle="dark-content" />
 
-      <View style={styles.inputBar}>
-        <TextInput
-          style={styles.textInput}
-          value={inputText}
-          onChangeText={setInputText}
-          placeholder="Type a message..."
-          placeholderTextColor="#888"
-          multiline
-          maxLength={1000}
-        />
-        <TouchableOpacity
-          style={[styles.sendButton, !inputText.trim() && styles.sendButtonDisabled]}
-          onPress={onSend}
-          disabled={!inputText.trim()}
-        >
-          <Icon name="send" size={18} color="#fff" />
+      {/* HEADER */}
+      <View style={styles.header}>
+        <Text style={styles.headerTitle}>Contacts</Text>
+
+        <TouchableOpacity style={styles.addBtn}>
+          <Text style={styles.addIcon}>＋</Text>
         </TouchableOpacity>
       </View>
-    </KeyboardAvoidingView>
+
+      {/* SEARCH */}
+      <SearchBar value={searchQuery} onChangeText={setsearchQuery} />
+
+      {/* LIST */}
+      <FlatList
+        data={filteredUsers}
+        keyExtractor={item => item.uid}
+        renderItem={renderItem}
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={{ paddingTop: 10 }}
+        ListEmptyComponent={
+          <Text style={styles.emptyText}>
+            No other users found
+          </Text>
+        }
+      />
+    </View>
   );
 };
 
-export default ChatScreen;
-
+export default HomeScreen;
 const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#fff',
+ 
   },
-  listContent: {
-    paddingHorizontal: 12,
-    paddingVertical: 8,
-  },
-  messageRow: {
-    marginVertical: 3,
-    flexDirection: 'row',
-  },
-  rowRight: {
-    justifyContent: 'flex-end',
-  },
-  rowLeft: {
-    justifyContent: 'flex-start',
-  },
-  bubble: {
-    maxWidth: '75%',
-    borderRadius: 16,
-    paddingHorizontal: 12,
-    paddingTop: 8,
-    paddingBottom: 4,
-  },
-  bubbleRight: {
-    backgroundColor: '#002DE3',
-    borderBottomRightRadius: 4,
-  },
-  bubbleLeft: {
-    backgroundColor: '#E9E9EB',
-    borderBottomLeftRadius: 4,
-  },
-  messageText: {
-    fontSize: 16,
-    lineHeight: 22,
-  },
-  textRight: {
-    color: '#fff',
-  },
-  textLeft: {
-    color: '#000',
-  },
-  timeText: {
-    fontSize: 11,
-    marginTop: 2,
-    alignSelf: 'flex-end',
-  },
-  timeRight: {
-    color: 'rgba(255,255,255,0.65)',
-  },
-  timeLeft: {
-    color: '#999',
-  },
-  inputBar: {
-    flexDirection: 'row',
-    alignItems: 'flex-end',
-    paddingHorizontal: 10,
-    paddingVertical: 8,
-    backgroundColor: '#7a7a7a',
-    elevation: 10,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: -3 },
-    shadowOpacity: 0.08,
-    shadowRadius: 6,
-  },
-  textInput: {
+
+  loader: {
     flex: 1,
-    backgroundColor: '#595f69',
-    borderRadius: 25,
-    paddingHorizontal: 16,
-    paddingVertical: Platform.OS === 'ios' ? 10 : 6,
-    fontSize: 16,
-    color: '#fff',
-    maxHeight: 120,
-    marginRight: 8,
-  },
-  sendButton: {
-    backgroundColor: '#002DE3',
-    width: 42,
-    height: 42,
-    borderRadius: 21,
     justifyContent: 'center',
     alignItems: 'center',
-    marginBottom: Platform.OS === 'ios' ? 0 : 2,
   },
-  sendButtonDisabled: {
-    backgroundColor: '#555',
+
+  /* HEADER */
+
+  header: {
+   // paddingHorizontal: 20,
+   // marginBottom: 10,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+
+  headerTitle: {
+    fontSize: 32,
+    fontWeight: '700',
+    color: '#000',
+  },
+
+  addBtn: {
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+
+  addIcon: {
+    fontSize: 28,
+    color: '#030407',
+    fontWeight: '600',
+  },
+
+  /* USER ROW */
+
+  userRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 20,
+    paddingVertical: 14,
+  },
+
+  avatarWrapper: {
+    position: 'relative',
+  },
+
+  avatarImg: {
+    width: 58,
+    height: 58,
+    borderRadius: 16,
+  },
+
+  avatarPlaceholder: {
+    width: 58,
+    height: 58,
+    borderRadius: 16,
+    backgroundColor: '#002DE3',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+
+  avatarText: {
+    color: '#fff',
+    fontSize: 20,
+    fontWeight: '700',
+  },
+
+  onlineDot: {
+    position: 'absolute',
+    bottom: 2,
+    right: 2,
+    width: 14,
+    height: 14,
+    borderRadius: 7,
+    backgroundColor: '#22C55E',
+    borderWidth: 2,
+    borderColor: '#fff',
+  },
+
+  textWrapper: {
+    marginLeft: 14,
+    flex: 1,
+  },
+
+  userName: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#000',
+  },
+
+  subtitle: {
+    marginTop: 4,
+    fontSize: 13,
+    color: '#8E8E93',
+  },
+
+  emptyText: {
+    textAlign: 'center',
+    marginTop: 40,
+    color: '#999',
   },
 });
-
-
-
-
-
-
-
 
 

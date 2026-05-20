@@ -35,27 +35,7 @@ const AppNavigator = () => {
                   alignItems: 'center',
                 }}
               >
-                <View
-                  style={{
-                    width: 40,
-                    height: 40,
-                    borderRadius: 20,
-                    backgroundColor: '#002DE3',
-                    justifyContent: 'center',
-                    alignItems: 'center',
-                    marginRight: 12,
-                  }}
-                >
-                  <Text
-                    style={{
-                      color: '#fff',
-                      fontSize: 16,
-                      fontWeight: '700',
-                    }}
-                  >
-                    {route.params?.receiverName?.charAt(0).toUpperCase()}
-                  </Text>
-                </View>
+                
 
                 <Text
                   style={{
