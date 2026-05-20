@@ -31,12 +31,17 @@ const ChatScreen = ({ route }) => {
       .get()
       .then(doc => {
         if (doc.exists) {
+         // console.log('user doc',doc.data());
+           console.log('all fields',JSON.stringify(doc.data()))
+          
           setSenderName(doc.data().name || currentUser.email);
+           console.log('current user uid',currentUser.uid)
         } else {
           setSenderName(currentUser.email);
         }
       })
       .catch(() => setSenderName(currentUser.email));
+     
   }, []);
 
   useEffect(() => {
@@ -96,11 +101,17 @@ const ChatScreen = ({ route }) => {
   }
 
   function renderMessage({ item }) {
+   // console.log(item)
     const isMe = item.user?._id === currentUser.uid;
 
     return (
       <View style={[styles.messageRow, isMe ? styles.rowRight : styles.rowLeft]}>
         <View style={[styles.bubble, isMe ? styles.bubbleRight : styles.bubbleLeft]}>
+          {!isMe &&(
+            <Text style={styles.senderName}>
+            {item.user?.name}
+          </Text>
+          )}
           <Text style={[styles.messageText, isMe ? styles.textRight : styles.textLeft]}>
             {item.text}
           </Text>
@@ -225,7 +236,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 19,
     paddingVertical:10,
     fontSize: 16,
-    color: '#fff',
+    color: '#040404',
     maxHeight: 120,
     marginRight: 8,
    // paddingBottom:5,
@@ -242,4 +253,10 @@ const styles = StyleSheet.create({
   sendButtonDisabled: {
     backgroundColor: '#555',
   },
+  senderName:{
+    fontSize:12,
+    fontWeight:'600',
+    color:'#555',
+    marginBottom:3,
+  }
 });
