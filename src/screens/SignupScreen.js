@@ -14,7 +14,7 @@ import firestore from '@react-native-firebase/firestore'
 
 import COLORS from '../constants/colors';
 import SPACING from '../constants/spacing';
-import {TYPOGRAPHY,RADIUS} from '../constants/typograph';
+import { TYPOGRAPHY, RADIUS } from '../constants/typograph';
 
 const SignupScreen = () => {
   const navigation = useNavigation();
@@ -147,6 +147,7 @@ const SignupScreen = () => {
 
 export default SignupScreen;
 
+
 const styles = StyleSheet.create({
   safe: {
     flex: 1,
@@ -170,7 +171,7 @@ const styles = StyleSheet.create({
 
   subtitle: {
     fontSize: TYPOGRAPHY.subtitle,
-    color: COLORS.secondaryText,
+    color: COLORS.subtitle,
     textAlign: 'center',
     marginBottom: SPACING.xl,
     paddingHorizontal: SPACING.md,
@@ -213,7 +214,7 @@ const styles = StyleSheet.create({
   },
 
   loginText: {
-    color: COLORS.secondaryText,
+    color: COLORS.subtitle,
     fontSize: TYPOGRAPHY.subtitle,
   },
 });

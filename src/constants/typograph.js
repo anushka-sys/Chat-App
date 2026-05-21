@@ -1,11 +1,18 @@
-const TYPOGRAPHY = {
+export const TYPOGRAPHY = {
   title: 26,
-  subtitle: 14,
-  input: 15,
-  button: 16,
+  subtitle: 14, 
+  input: 15, 
+  button: 16, 
 };
 
-const RADIUS = {
-  sm: 8,
-  lg: 30,
+export const RADIUS = {
+  xs : 8,
+  sm: 10, 
+  lg: 14, 
+  xl: 30,
 };
+
+export const fontWeight = {
+  m: '600',
+  l : '700',
+}

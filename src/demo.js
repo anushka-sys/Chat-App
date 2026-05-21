@@ -1,76 +1,56 @@
-
-// src/constants/colors.js
-
 const COLORS = {
-  primary: '#002DE3',
-  white: '#FFFFFF',
-  text: '#1A1A1A',
-  secondaryText: '#4A4A4A',
-  border: '#D0D5E8',
-  placeholder: '#9EACC7',
+  primary: '#007AFF', // blue — used for title, button background
+  white: '#FFFFFF', // background, button text
+  text: '#000000', // input text
+  secondaryText: '#9EACC7', // subtitle, placeholder, login link text
+  border: '#D0D9E8', // input border
 };
 
 export default COLORS;
 
 
-// src/constants/spacing.js
-
 const SPACING = {
-  xs: 4,
   sm: 8,
   md: 16,
   lg: 24,
-  xl: 36,
+  xl: 32,
   xxl: 48,
 };
 
 export default SPACING;
 
 
-// src/constants/typography.js
-
-const TYPOGRAPHY = {
-  title: 26,
-  subtitle: 14,
-  input: 15,
-  button: 16,
+export const TYPOGRAPHY = {
+  title: 28, // "Create Account" heading
+  subtitle: 14, // subtitle text, login link
+  input: 15, // text inside inputs
+  button: 16, // sign up button label
 };
 
-export default TYPOGRAPHY;
-
-
-
-// src/constants/radius.js
-
-const RADIUS = {
-  sm: 8,
-  lg: 30,
+export const RADIUS = {
+  sm: 10, // input wrap border radius
+  lg: 14, // button border radius
 };
-
-export default RADIUS;
 
 
 
 import {
+  StyleSheet,
   Text,
   TextInput,
   TouchableOpacity,
   View,
   Alert,
-  StyleSheet,
 } from 'react-native';
-
 import React, { useState } from 'react';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
-
 import auth from '@react-native-firebase/auth';
 import firestore from '@react-native-firebase/firestore';
 
 import COLORS from '../constants/colors';
 import SPACING from '../constants/spacing';
-import TYPOGRAPHY from '../constants/typography';
-import RADIUS from '../constants/radius';
+import { TYPOGRAPHY, RADIUS } from '../constants/typograph';
 
 const SignupScreen = () => {
   const navigation = useNavigation();
@@ -86,30 +66,26 @@ const SignupScreen = () => {
       Alert.alert('Error', 'Please fill all fields');
       return;
     }
-
     if (pass !== confirmPass) {
       Alert.alert('Error', 'Passwords do not match');
       return;
     }
-
     if (pass.length < 6) {
       Alert.alert('Error', 'Password must be at least 6 characters');
       return;
     }
 
     setLoading(true);
-
     try {
-      const userCredential =
-        await auth().createUserWithEmailAndPassword(
-          email.trim(),
-          pass,
-        );
+      const userCredential = await auth().createUserWithEmailAndPassword(
+        email.trim(),
+        pass,
+      );
 
       const uid = userCredential.user.uid;
 
       await firestore().collection('users').doc(uid).set({
-        uid,
+        uid: uid,
         email: email.trim(),
         name: name.trim(),
         createdAt: firestore.FieldValue.serverTimestamp(),
@@ -118,11 +94,9 @@ const SignupScreen = () => {
       await auth().signOut();
 
       Alert.alert('Success', 'Account created! Please login.');
-
       navigation.replace('Login');
     } catch (error) {
       console.log('Signup error:', error);
-
       if (error.code === 'auth/email-already-in-use') {
         Alert.alert('Error', 'Email already in use');
       } else if (error.code === 'auth/invalid-email') {
@@ -131,7 +105,6 @@ const SignupScreen = () => {
         Alert.alert('Error', error.message);
       }
     }
-
     setLoading(false);
   };
 
@@ -139,16 +112,13 @@ const SignupScreen = () => {
     <SafeAreaView style={styles.safe}>
       <View style={styles.container}>
         <Text style={styles.title}>Create Account</Text>
-
-        <Text style={styles.subtitle}>
-          Sign up to start chatting
-        </Text>
+        <Text style={styles.subtitle}>Sign up to start chatting</Text>
 
         <View style={styles.inputWrap}>
           <TextInput
             style={styles.input}
             placeholder="Enter your Name"
-            placeholderTextColor={COLORS.placeholder}
+            placeholderTextColor={COLORS.secondaryText}
             value={name}
             onChangeText={setName}
             autoCapitalize="none"
@@ -159,7 +129,7 @@ const SignupScreen = () => {
           <TextInput
             style={styles.input}
             placeholder="Email"
-            placeholderTextColor={COLORS.placeholder}
+            placeholderTextColor={COLORS.secondaryText}
             value={email}
             onChangeText={setEmail}
             keyboardType="email-address"
@@ -171,7 +141,7 @@ const SignupScreen = () => {
           <TextInput
             style={styles.input}
             placeholder="Password"
-            placeholderTextColor={COLORS.placeholder}
+            placeholderTextColor={COLORS.secondaryText}
             value={pass}
             onChangeText={setPass}
             secureTextEntry
@@ -182,7 +152,7 @@ const SignupScreen = () => {
           <TextInput
             style={styles.input}
             placeholder="Confirm Password"
-            placeholderTextColor={COLORS.placeholder}
+            placeholderTextColor={COLORS.secondaryText}
             value={confirmPass}
             onChangeText={setConfirmPass}
             secureTextEntry
@@ -195,9 +165,7 @@ const SignupScreen = () => {
           disabled={loading}
         >
           <Text style={styles.buttonText}>
-            {loading
-              ? 'Creating Account...'
-              : 'Sign up'}
+            {loading ? 'Creating Account...' : 'Sign up'}
           </Text>
         </TouchableOpacity>
 
@@ -205,9 +173,7 @@ const SignupScreen = () => {
           style={styles.loginLink}
           onPress={() => navigation.navigate('Login')}
         >
-          <Text style={styles.loginText}>
-            Already have an account? Login
-          </Text>
+          <Text style={styles.loginText}>Already have an account? Login</Text>
         </TouchableOpacity>
       </View>
     </SafeAreaView>

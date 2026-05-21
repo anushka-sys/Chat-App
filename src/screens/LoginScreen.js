@@ -14,6 +14,10 @@ import {
   signInWithEmailAndPassword,
 } from '@react-native-firebase/auth';
 
+import COLORS from '../constants/colors';
+import SPACING from '../constants/spacing';
+import { TYPOGRAPHY, RADIUS ,fontWeight} from '../constants/typograph';
+
 const LoginScreen = () => {
 
   const navigation = useNavigation();
@@ -144,63 +148,61 @@ const styles = StyleSheet.create({
 
   safe: {
     flex: 1,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: COLORS.white,
   },
 
   container: {
     flex: 1,
     alignItems: 'center',
-    paddingHorizontal: 24,
-    paddingTop: 48,
+    paddingHorizontal: SPACING.lg,
+    paddingTop: SPACING.xxl,
   },
 
   title: {
-    fontSize: 26,
-    fontWeight: '700',
-    color: '#002DE3',
-    marginBottom: 10,
+    fontSize: TYPOGRAPHY.title,
+    fontWeight: fontWeight.l,
+    color: COLORS.primary,
+    paddingBottom: SPACING.xs,
     textAlign: 'center',
   },
 
   subtitle: {
-    fontSize: 14,
+    fontSize: TYPOGRAPHY.subtitle,
     color: '#4A4A4A',
     textAlign: 'center',
-    lineHeight: 20,
-    marginBottom: 36,
-    paddingHorizontal: 16,
+    paddingBottom: SPACING.xxxl,
+    paddingHorizontal: SPACING.md,
   },
 
   inputWrap: {
     width: '90%',
     borderWidth: 1.5,
     borderColor: '#D0D5E8',
-    borderRadius: 8,
-    marginBottom: 16,
+    borderRadius: RADIUS.xs,
+    marginBottom: SPACING.md,
     backgroundColor: '#FFFFFF',
   },
 
   input: {
-    paddingVertical: 14,
-    paddingHorizontal: 16,
-    fontSize: 15,
-    color: '#1A1A1A',
+    paddingVertical: SPACING.small,
+    paddingHorizontal: SPACING.md,
+    fontSize: TYPOGRAPHY.input,
+    color: COLORS.input,
   },
 
   buttoncontainer: {
     width: '90%',
-    backgroundColor: '#002DE3',
-    borderRadius: 30,
+    backgroundColor: COLORS.primary,
+    borderRadius: RADIUS.xl,
     paddingVertical: 15,
     alignItems: 'center',
-    marginTop: 20,
+    marginTop: SPACING.med,
   },
 
   buttonText: {
-    color: '#FFFFFF',
-    fontSize: 16,
-    fontWeight: '600',
-    letterSpacing: 0.5,
+    color: COLORS.white,
+    fontSize: TYPOGRAPHY.button,
+    fontWeight: fontWeight.m,
   },
 
   signupLink: {
@@ -208,8 +210,8 @@ const styles = StyleSheet.create({
   },
 
   signupText: {
-    color: '#4A4A4A',
-    fontSize: 14,
+    color: COLORS.subtitle,
+    fontSize: TYPOGRAPHY.subtitle,
   },
 
 });

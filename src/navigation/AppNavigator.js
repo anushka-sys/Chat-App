@@ -35,8 +35,6 @@ const AppNavigator = () => {
                   alignItems: 'center',
                 }}
               >
-                
-
                 <Text
                   style={{
                     fontSize: 18,
