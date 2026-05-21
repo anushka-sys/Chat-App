@@ -12,6 +12,10 @@ import { useNavigation } from '@react-navigation/native';
 import auth from '@react-native-firebase/auth';
 import firestore from '@react-native-firebase/firestore'
 
+import COLORS from '../constants/colors';
+import SPACING from '../constants/spacing';
+import {TYPOGRAPHY,RADIUS} from '../constants/typograph';
+
 const SignupScreen = () => {
   const navigation = useNavigation();
 
@@ -146,61 +150,70 @@ export default SignupScreen;
 const styles = StyleSheet.create({
   safe: {
     flex: 1,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: COLORS.white,
   },
+
   container: {
     flex: 1,
     alignItems: 'center',
-    paddingHorizontal: 24,
-    paddingTop: 48,
+    paddingHorizontal: SPACING.lg,
+    paddingTop: SPACING.xxl,
   },
+
   title: {
-    fontSize: 26,
+    fontSize: TYPOGRAPHY.title,
     fontWeight: '700',
-    color: '#002DE3',
+    color: COLORS.primary,
     marginBottom: 10,
     textAlign: 'center',
   },
+
   subtitle: {
-    fontSize: 14,
-    color: '#4A4A4A',
+    fontSize: TYPOGRAPHY.subtitle,
+    color: COLORS.secondaryText,
     textAlign: 'center',
-    marginBottom: 36,
-    paddingHorizontal: 16,
+    marginBottom: SPACING.xl,
+    paddingHorizontal: SPACING.md,
   },
+
   inputWrap: {
     width: '90%',
     borderWidth: 1.5,
-    borderColor: '#D0D5E8',
-    borderRadius: 8,
-    marginBottom: 16,
-    backgroundColor: '#FFFFFF',
+    borderColor: COLORS.border,
+    borderRadius: RADIUS.sm,
+    marginBottom: SPACING.md,
+    backgroundColor: COLORS.white,
   },
+
   input: {
     paddingVertical: 14,
-    paddingHorizontal: 16,
-    fontSize: 15,
-    color: '#1A1A1A',
+    paddingHorizontal: SPACING.md,
+    fontSize: TYPOGRAPHY.input,
+    color: COLORS.text,
   },
+
   buttoncontainer: {
     width: '90%',
-    backgroundColor: '#002DE3',
-    borderRadius: 30,
+    backgroundColor: COLORS.primary,
+    borderRadius: RADIUS.lg,
     paddingVertical: 15,
     alignItems: 'center',
     marginTop: 20,
   },
+
   buttonText: {
-    color: '#FFFFFF',
-    fontSize: 16,
+    color: COLORS.white,
+    fontSize: TYPOGRAPHY.button,
     fontWeight: '600',
   },
+
   loginLink: {
     paddingTop: 18,
     paddingBottom: 28,
   },
+
   loginText: {
-    color: '#4A4A4A',
-    fontSize: 14,
+    color: COLORS.secondaryText,
+    fontSize: TYPOGRAPHY.subtitle,
   },
 });
