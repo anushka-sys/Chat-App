@@ -34,7 +34,7 @@ const TabNavigator = () => {
           let iconName;
 
           if (route.name === 'Chats') {
-            iconName = focused ? 'home' : 'home-outline';
+            iconName = focused ? 'chatbubbles' : 'chatbubbles-outline';
           } else if (route.name === 'Profile') {
             iconName = focused ? 'person' : 'person-outline';
           } else if (route.name === 'Settings') {
@@ -47,7 +47,7 @@ const TabNavigator = () => {
     >
       <Tab.Screen name="Chats" component={HomeScreen} options={{ headerShown: false }}/>
       <Tab.Screen name="Profile" component={ProfileScreen}  options={{ headerShown: false }}/>
-      <Tab.Screen name="Settings" component={SettingScreen} />
+      <Tab.Screen name="Settings" component={SettingScreen} options={{ headerShown: false }}/>
     </Tab.Navigator>
   );
 };
