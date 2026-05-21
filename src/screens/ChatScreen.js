@@ -41,7 +41,6 @@ const ChatScreen = ({ route }) => {
         }
       })
       .catch(() => setSenderName(currentUser.email));
-     
   }, []);
 
   useEffect(() => {
@@ -60,7 +59,6 @@ const ChatScreen = ({ route }) => {
         });
         setMessages(msgs);
       });
-
     return unsubscribe;
   }, [conversationId]);
 
@@ -72,9 +70,7 @@ const ChatScreen = ({ route }) => {
   async function onSend() {
     const text = inputText.trim();
     if (!text) return;
-
     setInputText('');
-
     const newMessage = {
       _id: firestore().collection('_').doc().id,
       text: text,
@@ -86,9 +82,7 @@ const ChatScreen = ({ route }) => {
         name: senderName || currentUser.email,
       },
     };
-
     setMessages(prev => [{ ...newMessage, createdAt: new Date() }, ...prev]);
-
     try {
       await firestore()
         .collection('conversations')
