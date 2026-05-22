@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import {
   View,
   Text,
@@ -7,7 +7,7 @@ import {
   Image,
   StyleSheet,
   ActivityIndicator,
-  StatusBar
+  StatusBar,
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import firestore from '@react-native-firebase/firestore';
@@ -24,21 +24,27 @@ const HomeScreen = () => {
   useEffect(() => {
     const unsubscribe = firestore()
       .collection('users')
+      .limit(30)
       .onSnapshot(snapshot => {
         const allUsers = snapshot.docs
-          .map(doc => doc.data())
-          .filter(u => u.uid !== currentUid);
+          .map(doc => ({
+            id: doc.id,
+            ...doc.data(),
+          }))
+          .filter(user => user.uid !== currentUid);
 
         setUsers(allUsers);
         setLoading(false);
       });
 
     return () => unsubscribe();
-  }, []);
+  }, [currentUid]);
 
-  const filteredUsers = users.filter(u =>
-    u.name?.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  const filteredUsers = React.useMemo(() => {
+    return users.filter(user =>
+      user.name?.toLowerCase().includes(searchQuery.toLowerCase()),
+    );
+  }, [users, searchQuery]);
 
   const renderItem = ({ item }) => (
     <TouchableOpacity
@@ -64,7 +70,7 @@ const HomeScreen = () => {
         )}
 
         {/* Online indicator placeholder */}
-        <View style={styles.onlineDot} />
+        {item.isOnline && <View style={styles.onlineDot} />}
       </View>
 
       {/* Name + subtitle */}
@@ -92,7 +98,7 @@ const HomeScreen = () => {
         <Text style={styles.headerTitle}>Contacts</Text>
 
         <TouchableOpacity style={styles.addBtn}>
-          <Text style={styles.addIcon}>＋</Text>
+          <Text style={styles.addIcon}>+</Text>
         </TouchableOpacity>
       </View>
 
@@ -106,10 +112,13 @@ const HomeScreen = () => {
         renderItem={renderItem}
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{ paddingTop: 10 }}
+        initialNumToRender={10}
+        maxToRenderPerBatch={10}
+        windowSize={5}
+        removeClippedSubviews={true}
+        keyboardShouldPersistTaps="handled"
         ListEmptyComponent={
-          <Text style={styles.emptyText}>
-            No other users found
-          </Text>
+          <Text style={styles.emptyText}>No other users found</Text>
         }
       />
     </View>
@@ -134,7 +143,7 @@ const styles = StyleSheet.create({
 
   header: {
     paddingHorizontal: 20,
-   // marginBottom: 10,
+    // marginBottom: 10,
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
@@ -194,17 +203,17 @@ const styles = StyleSheet.create({
     fontWeight: '700',
   },
 
-  // onlineDot: {
-  //   position: 'absolute',
-  //   bottom: 2,
-  //   right: 2,
-  //   width: 14,
-  //   height: 14,
-  //   borderRadius: 7,
-  //   backgroundColor: '#22C55E',
-  //   borderWidth: 2,
-  //   borderColor: '#fff',
-  // },
+  onlineDot: {
+    position: 'absolute',
+    bottom: 2,
+    right: 2,
+    width: 14,
+    height: 14,
+    borderRadius: 7,
+    backgroundColor: '#22C55E',
+    borderWidth: 2,
+    borderColor: '#fff',
+  },
 
   textWrapper: {
     marginLeft: 14,

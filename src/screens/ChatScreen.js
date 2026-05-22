@@ -31,11 +31,11 @@ const ChatScreen = ({ route }) => {
       .get()
       .then(doc => {
         if (doc.exists) {
-         // console.log('user doc',doc.data());
-           console.log('all fields',JSON.stringify(doc.data()))
-          
+          // console.log('user doc',doc.data());
+          //console.log('all fields', JSON.stringify(doc.data()));
+
           setSenderName(doc.data().name || currentUser.email);
-           console.log('current user uid',currentUser.uid)
+          console.log('current user uid', currentUser.uid);
         } else {
           setSenderName(currentUser.email);
         }
@@ -79,7 +79,8 @@ const ChatScreen = ({ route }) => {
       sentTo: receiverUid,
       user: {
         _id: currentUser.uid,
-        name: senderName || currentUser.email,
+        name:
+          senderName || currentUser.displayName || currentUser.email || 'User',
       },
     };
     setMessages(prev => [{ ...newMessage, createdAt: new Date() }, ...prev]);
@@ -95,21 +96,32 @@ const ChatScreen = ({ route }) => {
   }
 
   function renderMessage({ item }) {
-   // console.log(item)
+    // console.log(item)
     const isMe = item.user?._id === currentUser.uid;
 
     return (
-      <View style={[styles.messageRow, isMe ? styles.rowRight : styles.rowLeft]}>
-        <View style={[styles.bubble, isMe ? styles.bubbleRight : styles.bubbleLeft]}>
-          {!isMe &&(
+      <View
+        style={[styles.messageRow, isMe ? styles.rowRight : styles.rowLeft]}
+      >
+        <View
+          style={[styles.bubble, isMe ? styles.bubbleRight : styles.bubbleLeft]}
+        >
+          {!isMe && (
             <Text style={styles.senderName}>
-            {item.user?.name}
-          </Text>
+              {item.user?.name || 'Unknown User'}
+            </Text>
           )}
-          <Text style={[styles.messageText, isMe ? styles.textRight : styles.textLeft]}>
+          <Text
+            style={[
+              styles.messageText,
+              isMe ? styles.textRight : styles.textLeft,
+            ]}
+          >
             {item.text}
           </Text>
-          <Text style={[styles.timeText, isMe ? styles.timeRight : styles.timeLeft]}>
+          <Text
+            style={[styles.timeText, isMe ? styles.timeRight : styles.timeLeft]}
+          >
             {formatTime(item.createdAt)}
           </Text>
         </View>
@@ -130,6 +142,11 @@ const ChatScreen = ({ route }) => {
         inverted
         contentContainerStyle={styles.listContent}
         keyboardShouldPersistTaps="handled"
+        initialNumToRender={15}
+        maxToRenderPerBatch={10}
+        windowSize={7}
+        removeClippedSubviews={true}
+        ListEmptyComponent={<Text style={styles.emptyText}>No messages yet</Text>}
       />
 
       <View style={styles.inputBar}>
@@ -143,7 +160,10 @@ const ChatScreen = ({ route }) => {
           maxLength={1000}
         />
         <TouchableOpacity
-          style={[styles.sendButton, !inputText.trim() && styles.sendButtonDisabled]}
+          style={[
+            styles.sendButton,
+            !inputText.trim() && styles.sendButtonDisabled,
+          ]}
           onPress={onSend}
           disabled={!inputText.trim()}
         >
@@ -228,12 +248,12 @@ const styles = StyleSheet.create({
     backgroundColor: '#e7e7e7',
     borderRadius: 25,
     paddingHorizontal: 19,
-    paddingVertical:10,
+    paddingVertical: 10,
     fontSize: 16,
     color: '#040404',
     maxHeight: 120,
     marginRight: 8,
-   // paddingBottom:5,
+    // paddingBottom:5,
   },
   sendButton: {
     backgroundColor: '#002DE3',
@@ -247,10 +267,15 @@ const styles = StyleSheet.create({
   sendButtonDisabled: {
     backgroundColor: '#555',
   },
-  senderName:{
-    fontSize:12,
-    fontWeight:'600',
-    color:'#555',
-    marginBottom:3,
-  }
+  senderName: {
+    fontSize: 12,
+    fontWeight: '600',
+    color: '#555',
+    marginBottom: 3,
+  },
+  emptyText: {
+    textAlign: 'center',
+    marginTop: 40,
+    color: '#999',
+  },
 });

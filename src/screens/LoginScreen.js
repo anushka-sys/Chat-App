@@ -79,7 +79,7 @@ const LoginScreen = () => {
           Login to continue chatting with your friends
         </Text>
 
-        {/* Email Input */}
+      
         <View style={styles.inputWrap}>
 
           <TextInput
@@ -95,7 +95,7 @@ const LoginScreen = () => {
 
         </View>
 
-        {/* Password Input */}
+        
         <View style={styles.inputWrap}>
 
           <TextInput
@@ -111,7 +111,7 @@ const LoginScreen = () => {
 
         </View>
 
-        {/* Login Button */}
+        
         <TouchableOpacity
           style={styles.buttoncontainer}
           onPress={loginUser}
@@ -124,7 +124,7 @@ const LoginScreen = () => {
 
         </TouchableOpacity>
 
-        {/* Signup Navigation */}
+      
         <TouchableOpacity
           style={styles.signupLink}
           onPress={() => navigation.navigate('Signup')}
