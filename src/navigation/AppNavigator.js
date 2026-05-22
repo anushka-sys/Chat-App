@@ -11,6 +11,8 @@ import ChatScreen from '../screens/ChatScreen';
 const Stack = createStackNavigator();
 
 const AppNavigator = () => {
+  
+
   return (
     <NavigationContainer>
       <Stack.Navigator
@@ -31,7 +33,7 @@ const AppNavigator = () => {
             headerTitle: () => (
               <View
                 style={{
-                  flexDirection: 'row',
+                  flexDirection: 'column',
                   alignItems: 'center',
                 }}
               >
@@ -43,6 +45,10 @@ const AppNavigator = () => {
                   }}
                 >
                   {route.params?.receiverName}
+                  
+                </Text>
+                <Text style={{ color: 'green', fontSize: 12, }}>
+                  {route.params?.isOnline ? 'Online' : 'Offline'}
                 </Text>
               </View>
             ),
