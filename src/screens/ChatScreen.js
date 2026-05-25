@@ -69,7 +69,7 @@ const ChatScreen = ({ route }) => {
   function formatTime(date) {
     if (!date) return '';
     return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-  }3
+  }
 
   async function onSend() {
     const text = inputText.trim();
@@ -110,11 +110,14 @@ const ChatScreen = ({ route }) => {
         <View
           style={[styles.bubble, isMe ? styles.bubbleRight : styles.bubbleLeft]}
         >
-          {!isMe && (
+          {/* {!isMe && (
             <Text style={styles.senderName}>
               {item.user?.name || 'Unknown User'}
             </Text>
-          )}
+          )} */}
+           <Text style={[styles.senderName, isMe ? styles.senderNameRight : styles.senderNameLeft]}>
+              {isMe ? 'You' : (item.user?.name || 'Unknown User')}
+            </Text>
           <Text
             style={[
               styles.messageText,
@@ -281,4 +284,7 @@ const styles = StyleSheet.create({
     marginTop: 40,
     color: '#999',
   },
+  senderNameRight:{
+    color: 'rgba(255,255,255,0.65)',
+  }
 });

@@ -16,10 +16,9 @@ import {
 
 import COLORS from '../constants/colors';
 import SPACING from '../constants/spacing';
-import { TYPOGRAPHY, RADIUS ,fontWeight} from '../constants/typograph';
+import { TYPOGRAPHY, RADIUS, fontWeight } from '../constants/typograph';
 
 const LoginScreen = () => {
-
   const navigation = useNavigation();
 
   const [email, setEmail] = useState('');
@@ -28,10 +27,8 @@ const LoginScreen = () => {
 
   // Login function
   const loginUser = async () => {
-
     // Validation
     if (!email || !pass) {
-
       Alert.alert('Error', 'Please enter email and password');
       return;
     }
@@ -39,17 +36,11 @@ const LoginScreen = () => {
     setLoading(true);
 
     try {
-
       const auth = getAuth();
-      await signInWithEmailAndPassword(
-        auth,
-        email.trim(),
-        pass
-      );
+      await signInWithEmailAndPassword(auth, email.trim(), pass);
       Alert.alert('Success', 'Login successful');
       navigation.replace('Main');
     } catch (error) {
-
       console.log('Login error:', error.code, error.message);
       if (error.code === 'auth/user-not-found') {
         Alert.alert('Error', 'No account found with this email');
@@ -68,20 +59,14 @@ const LoginScreen = () => {
 
   return (
     <SafeAreaView style={styles.safe}>
-
       <View style={styles.container}>
-
-        <Text style={styles.title}>
-          Welcome Back
-        </Text>
+        <Text style={styles.title}>Welcome Back</Text>
 
         <Text style={styles.subtitle}>
           Login to continue chatting with your friends
         </Text>
 
-      
         <View style={styles.inputWrap}>
-
           <TextInput
             style={styles.input}
             placeholder="Email"
@@ -92,12 +77,9 @@ const LoginScreen = () => {
             autoCapitalize="none"
             autoCorrect={false}
           />
-
         </View>
 
-        
         <View style={styles.inputWrap}>
-
           <TextInput
             style={styles.input}
             placeholder="Password"
@@ -108,36 +90,25 @@ const LoginScreen = () => {
             autoCapitalize="none"
             autoCorrect={false}
           />
-
         </View>
 
-        
         <TouchableOpacity
           style={styles.buttoncontainer}
           onPress={loginUser}
           disabled={loading}
         >
-
           <Text style={styles.buttonText}>
             {loading ? 'Logging in...' : 'Log in'}
           </Text>
-
         </TouchableOpacity>
 
-      
         <TouchableOpacity
           style={styles.signupLink}
           onPress={() => navigation.navigate('Signup')}
         >
-
-          <Text style={styles.signupText}>
-            Don't have an account? Sign up
-          </Text>
-
+          <Text style={styles.signupText}>Don't have an account? Sign up</Text>
         </TouchableOpacity>
-
       </View>
-
     </SafeAreaView>
   );
 };
@@ -145,7 +116,6 @@ const LoginScreen = () => {
 export default LoginScreen;
 
 const styles = StyleSheet.create({
-
   safe: {
     flex: 1,
     backgroundColor: COLORS.white,
@@ -213,5 +183,4 @@ const styles = StyleSheet.create({
     color: COLORS.subtitle,
     fontSize: TYPOGRAPHY.subtitle,
   },
-
 });
