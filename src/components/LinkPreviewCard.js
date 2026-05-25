@@ -2,33 +2,19 @@ import React, { useEffect, useState } from 'react';
 import {
   View,
   Text,
-  FlatList,
-  TextInput,
-  TouchableOpacity,
-  Platform,
-  StyleSheet,
-  KeyboardAvoidingView,
   Image,
+  TouchableOpacity,
+  StyleSheet,
   Linking,
 } from 'react-native';
-import Icon from 'react-native-vector-icons/Ionicons';
-import { useHeaderHeight } from '@react-navigation/elements';
-import auth from '@react-native-firebase/auth';
-import firestore from '@react-native-firebase/firestore';
 import { getLinkPreview } from 'link-preview-js';
 
-import COLORS from '../constants/colors';
-import SPACING from '../constants/spacing';
-import { TYPOGRAPHY, RADIUS, fontWeight } from '../constants/typograph';
-
-// ─────────────────────────────────────────────
-// LinkPreviewCard Component
-// ─────────────────────────────────────────────
 const LinkPreviewCard = ({ url }) => {
   const [preview, setPreview] = useState(null);
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
+    // Reset preview whenever url changes or is cleared
     if (!url) {
       setPreview(null);
       return;
@@ -41,45 +27,56 @@ const LinkPreviewCard = ({ url }) => {
         setLoading(false);
       })
       .catch(() => {
+        // Silently fail — many sites block CORS; just hide the card
         setPreview(null);
         setLoading(false);
       });
   }, [url]);
 
+  // Show loading state while fetching
   if (loading) {
     return (
-      <View style={previewStyles.container}>
-        <Text style={previewStyles.loadingText}>Loading preview...</Text>
+      <View style={styles.container}>
+        <Text style={styles.loadingText}>Loading preview...</Text>
       </View>
     );
   }
 
+  // Nothing to show if fetch failed or no url
   if (!preview) return null;
 
   return (
+    // Tapping the card opens the URL in the device browser
     <TouchableOpacity
-      style={previewStyles.container}
+      style={styles.container}
       onPress={() => Linking.openURL(url)}
       activeOpacity={0.8}
     >
+      {/* Show OG image if available */}
       {preview.images?.[0] && (
         <Image
           source={{ uri: preview.images[0] }}
-          style={previewStyles.image}
+          style={styles.image}
           resizeMode="cover"
         />
       )}
-      <View style={previewStyles.textContainer}>
+
+      <View style={styles.textContainer}>
+        {/* Site name e.g. "YouTube", "GitHub" */}
         {preview.siteName && (
-          <Text style={previewStyles.siteName}>{preview.siteName}</Text>
+          <Text style={styles.siteName}>{preview.siteName}</Text>
         )}
+
+        {/* Page title */}
         {preview.title && (
-          <Text style={previewStyles.title} numberOfLines={2}>
+          <Text style={styles.title} numberOfLines={2}>
             {preview.title}
           </Text>
         )}
+
+        {/* Page description */}
         {preview.description && (
-          <Text style={previewStyles.description} numberOfLines={2}>
+          <Text style={styles.description} numberOfLines={2}>
             {preview.description}
           </Text>
         )}
@@ -88,18 +85,9 @@ const LinkPreviewCard = ({ url }) => {
   );
 };
 
-const previewStyles = StyleSheet.create({
-  previewWrapper: {
-    marginHorizontal: 10,
-    marginBottom: 6,
-    position: 'relative',
-  },
-  closeButton: {
-    position: 'absolute',
-    top: 6,
-    right: 6,
-    zIndex: 1,
-  },
+export default LinkPreviewCard;
+
+const styles = StyleSheet.create({
   container: {
     backgroundColor: '#f0f0f0',
     borderRadius: 10,
@@ -138,4 +126,3 @@ const previewStyles = StyleSheet.create({
     fontSize: 12,
   },
 });
-export default LinkPreviewCard;

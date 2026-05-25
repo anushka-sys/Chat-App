@@ -8,40 +8,39 @@ import {
   Platform,
   StyleSheet,
   KeyboardAvoidingView,
-  Linking,
 } from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
 import { useHeaderHeight } from '@react-navigation/elements';
 import auth from '@react-native-firebase/auth';
 import firestore from '@react-native-firebase/firestore';
-import { getLinkPreview } from 'link-preview-js';
+import LinkPreviewCard from '../components/LinkPreviewCard';
 
 import COLORS from '../constants/colors';
 import SPACING from '../constants/spacing';
-import { TYPOGRAPHY, RADIUS ,fontWeight} from '../constants/typograph';
+import { TYPOGRAPHY, RADIUS, fontWeight } from '../constants/typograph';
 
 const ChatScreen = ({ route }) => {
   const { receiverUid } = route.params;
   const [messages, setMessages] = useState([]);
   const [senderName, setSenderName] = useState('');
   const [inputText, setInputText] = useState('');
-    const [previewUrl, setPreviewUrl] = useState('');
+
+  const [previewUrl, setPreviewUrl] = useState('');
 
   const headerHeight = useHeaderHeight();
   const currentUser = auth().currentUser;
   const conversationId = [currentUser.uid, receiverUid].sort().join('_'); //creates a unique chat roomid
 
-    // Helper: extract first URL from text
   function extractUrl(text) {
     const urlRegex = /(https?:\/\/[^\s]+)/g;
     const match = text.match(urlRegex);
     return match ? match[0] : null;
   }
 
-  useEffect(() => {               //fetch currently logged in user's name
-    firestore()     
+  useEffect(() => {
+    firestore()
       .collection('users')
-      .doc(currentUser.uid) 
+      .doc(currentUser.uid)
       .get()
       .then(doc => {
         if (doc.exists) {
@@ -49,7 +48,7 @@ const ChatScreen = ({ route }) => {
           //console.log('all fields', JSON.stringify(doc.data()));
 
           setSenderName(doc.data().name || currentUser.email);
-         // console.log('current user uid', currentUser.uid);
+          // console.log('current user uid', currentUser.uid);
         } else {
           setSenderName(currentUser.email);
         }
@@ -59,12 +58,13 @@ const ChatScreen = ({ route }) => {
 
   useEffect(() => {
     const unsubscribe = firestore()
-      .collection('conversations')     
+      .collection('conversations')
       .doc(conversationId)
       .collection('messages')
-      .orderBy('createdAt', 'desc')      //newest msg first
+      .orderBy('createdAt', 'desc') //newest msg first
       .onSnapshot(snapshot => {
-        const msgs = snapshot.docs.map(doc => {  //converts firestore doc into normal js obj
+        const msgs = snapshot.docs.map(doc => {
+          //converts firestore doc into normal js obj
           const data = doc.data();
           return {
             ...data,
@@ -83,11 +83,12 @@ const ChatScreen = ({ route }) => {
 
   async function onSend() {
     const text = inputText.trim();
-    if (!text) return;    //check if empty
+    if (!text) return; //check if empty
     setInputText('');
-    setPreviewUrl(''); 
+    setPreviewUrl('');
 
-    const newMessage = {                                   //message object
+    const newMessage = {
+      //message object
       _id: firestore().collection('_').doc().id,
       text: text,
       createdAt: firestore.FieldValue.serverTimestamp(),
@@ -101,7 +102,7 @@ const ChatScreen = ({ route }) => {
     };
     setMessages(prev => [{ ...newMessage, createdAt: new Date() }, ...prev]);
     try {
-      await firestore()                         //save to firestore
+      await firestore() //save to firestore
         .collection('conversations')
         .doc(conversationId)
         .collection('messages')
@@ -114,11 +115,12 @@ const ChatScreen = ({ route }) => {
   function renderMessage({ item }) {
     // console.log(item)
     const isMe = item.user?._id === currentUser.uid;
-     const urlInMessage = extractUrl(item.text);
+
+    const urlInMessage = extractUrl(item.text);
 
     return (
       <View
-        style={[styles.messageRow, isMe ? styles.rowRight : styles.rowLeft]}        //my msg(sender) right side other msg left side
+        style={[styles.messageRow, isMe ? styles.rowRight : styles.rowLeft]} //my msg(sender) right side other msg left side
       >
         <View
           style={[styles.bubble, isMe ? styles.bubbleRight : styles.bubbleLeft]}
@@ -128,9 +130,14 @@ const ChatScreen = ({ route }) => {
               {item.user?.name || 'Unknown User'}
             </Text>
           )} */}
-           <Text style={[styles.senderName, isMe ? styles.senderNameRight : styles.senderNameLeft]}>
-              {isMe ? 'You' : (item.user?.name || 'Unknown User')}
-            </Text>
+          <Text
+            style={[
+              styles.senderName,
+              isMe ? styles.senderNameRight : styles.senderNameLeft,
+            ]}
+          >
+            {isMe ? 'You' : item.user?.name || 'Unknown User'}
+          </Text>
           <Text
             style={[
               styles.messageText,
@@ -139,7 +146,9 @@ const ChatScreen = ({ route }) => {
           >
             {item.text}
           </Text>
-           {urlInMessage && <LinkPreviewCard url={urlInMessage} />}
+
+          {urlInMessage && <LinkPreviewCard url={urlInMessage} />}
+
           <Text
             style={[styles.timeText, isMe ? styles.timeRight : styles.timeLeft]}
           >
@@ -167,14 +176,17 @@ const ChatScreen = ({ route }) => {
         maxToRenderPerBatch={10}
         windowSize={7}
         removeClippedSubviews={true}
-        ListEmptyComponent={<Text style={styles.emptyText}>No messages yet</Text>}
+        ListEmptyComponent={
+          <Text style={styles.emptyText}>No messages yet</Text>
+        }
       />
 
-           {previewUrl ? (
-        <View style={previewStyles.previewWrapper}>
+      {previewUrl ? (
+        <View style={inputPreviewStyles.wrapper}>
           <LinkPreviewCard url={previewUrl} />
+          {/* ✅ X button clears the previewUrl state and hides the banner */}
           <TouchableOpacity
-            style={previewStyles.closeButton}
+            style={inputPreviewStyles.closeButton}
             onPress={() => setPreviewUrl('')}
           >
             <Icon name="close-circle" size={20} color="#555" />
@@ -186,10 +198,11 @@ const ChatScreen = ({ route }) => {
         <TextInput
           style={styles.textInput}
           value={inputText}
-           onChangeText={text => {
+          onChangeText={text => {
             setInputText(text);
+            // ✅ Detect URL on every keystroke and update previewUrl state
             const url = extractUrl(text);
-            setPreviewUrl(url || ''); // update preview URL state as user types
+            setPreviewUrl(url || '');
           }}
           placeholder="Type a message..."
           placeholderTextColor="#494949"
@@ -212,6 +225,20 @@ const ChatScreen = ({ route }) => {
 };
 
 export default ChatScreen;
+
+const inputPreviewStyles = StyleSheet.create({
+  wrapper: {
+    marginHorizontal: 10,
+    marginBottom: 6,
+    position: 'relative',
+  },
+  closeButton: {
+    position: 'absolute',
+    top: 6,
+    right: 6,
+    zIndex: 1,
+  },
+});
 
 const styles = StyleSheet.create({
   container: {
@@ -314,7 +341,7 @@ const styles = StyleSheet.create({
     marginTop: 40,
     color: '#999',
   },
-  senderNameRight:{
-    color: 'rgba(255,255,255,0.65)',
-  }
+  senderNameRight: {
+    color: '#ffffff',
+  },
 });
