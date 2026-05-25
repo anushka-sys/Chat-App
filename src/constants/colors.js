@@ -5,7 +5,8 @@ const COLORS = {
   secondaryText: '#131315', // subtitle, placeholder, login link text
   border: '#D0D9E8', // input border
   subtitle : '#4A4A4A',
-  input: '#1A1A1A'
+  input: '#1A1A1A',
+  secondary: '#E9E9EB',
 };
 
 export default COLORS;

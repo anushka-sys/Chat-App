@@ -23,24 +23,24 @@ const HomeScreen = () => {
 
   useEffect(() => {
     const unsubscribe = firestore()
-      .collection('users')
-      .limit(30)
-      .onSnapshot(snapshot => {
+      .collection('users')            //fetch users
+      .limit(30) 
+      .onSnapshot(snapshot => {   ///creates realtimelistner
         const allUsers = snapshot.docs
           .map(doc => ({
             id: doc.id,
-            ...doc.data(),
+            ...doc.data(),             //spreads all firestore fields into onj
           }))
-          .filter(user => user.uid !== currentUid);
+          .filter(user => user.uid !== currentUid); //filter current user
 
         setUsers(allUsers);
         setLoading(false);
       });
 
-    return () => unsubscribe();
+    return () => unsubscribe(); //stop listner
   }, [currentUid]);
 
-  const filteredUsers = React.useMemo(() => {
+  const filteredUsers = useMemo(() => {
     return users.filter(user =>
       user.name?.toLowerCase().includes(searchQuery.toLowerCase()),
     );
@@ -57,7 +57,7 @@ const HomeScreen = () => {
         })
       }
     >
-      {/* Avatar */}
+      
       <View style={styles.avatarWrapper}>
         {item.image ? (
           <Image source={{ uri: item.image }} style={styles.avatarImg} />
@@ -69,11 +69,11 @@ const HomeScreen = () => {
           </View>
         )}
 
-        {/* Online indicator placeholder */}
+        
         {item.isOnline && <View style={styles.onlineDot} />}
       </View>
 
-      {/* Name + subtitle */}
+   
       <View style={styles.textWrapper}>
         <Text style={styles.userName}>{item.name}</Text>
         <Text style={styles.subtitle}>Tap to chat</Text>
@@ -93,7 +93,7 @@ const HomeScreen = () => {
     <View style={styles.container}>
       <StatusBar barStyle="dark-content" />
 
-      {/* HEADER */}
+      
       <View style={styles.header}>
         <Text style={styles.headerTitle}>Contacts</Text>
 
@@ -102,10 +102,10 @@ const HomeScreen = () => {
         </TouchableOpacity>
       </View>
 
-      {/* SEARCH */}
+   
       <SearchBar value={searchQuery} onChangeText={setsearchQuery} />
 
-      {/* LIST */}
+     
       <FlatList
         data={filteredUsers}
         keyExtractor={item => item.uid}

@@ -14,6 +14,10 @@ import { useHeaderHeight } from '@react-navigation/elements';
 import auth from '@react-native-firebase/auth';
 import firestore from '@react-native-firebase/firestore';
 
+import COLORS from '../constants/colors';
+import SPACING from '../constants/spacing';
+import { TYPOGRAPHY, RADIUS ,fontWeight} from '../constants/typograph';
+
 const ChatScreen = ({ route }) => {
   const { receiverUid } = route.params;
   const [messages, setMessages] = useState([]);
@@ -22,12 +26,12 @@ const ChatScreen = ({ route }) => {
 
   const headerHeight = useHeaderHeight();
   const currentUser = auth().currentUser;
-  const conversationId = [currentUser.uid, receiverUid].sort().join('_');
+  const conversationId = [currentUser.uid, receiverUid].sort().join('_'); //creates a unique chat roomid
 
-  useEffect(() => {
-    firestore()
+  useEffect(() => {               //fetch currently logged in user's name
+    firestore()     
       .collection('users')
-      .doc(currentUser.uid)
+      .doc(currentUser.uid) 
       .get()
       .then(doc => {
         if (doc.exists) {
@@ -35,7 +39,7 @@ const ChatScreen = ({ route }) => {
           //console.log('all fields', JSON.stringify(doc.data()));
 
           setSenderName(doc.data().name || currentUser.email);
-          console.log('current user uid', currentUser.uid);
+         // console.log('current user uid', currentUser.uid);
         } else {
           setSenderName(currentUser.email);
         }
@@ -45,12 +49,12 @@ const ChatScreen = ({ route }) => {
 
   useEffect(() => {
     const unsubscribe = firestore()
-      .collection('conversations')
+      .collection('conversations')     
       .doc(conversationId)
       .collection('messages')
-      .orderBy('createdAt', 'desc')
+      .orderBy('createdAt', 'desc')      //newest msg first
       .onSnapshot(snapshot => {
-        const msgs = snapshot.docs.map(doc => {
+        const msgs = snapshot.docs.map(doc => {  //converts firestore doc into normal js obj
           const data = doc.data();
           return {
             ...data,
@@ -65,13 +69,13 @@ const ChatScreen = ({ route }) => {
   function formatTime(date) {
     if (!date) return '';
     return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-  }
+  }3
 
   async function onSend() {
     const text = inputText.trim();
-    if (!text) return;
+    if (!text) return;    //check if empty
     setInputText('');
-    const newMessage = {
+    const newMessage = {                                   //message object
       _id: firestore().collection('_').doc().id,
       text: text,
       createdAt: firestore.FieldValue.serverTimestamp(),
@@ -85,7 +89,7 @@ const ChatScreen = ({ route }) => {
     };
     setMessages(prev => [{ ...newMessage, createdAt: new Date() }, ...prev]);
     try {
-      await firestore()
+      await firestore()                         //save to firestore
         .collection('conversations')
         .doc(conversationId)
         .collection('messages')
@@ -101,7 +105,7 @@ const ChatScreen = ({ route }) => {
 
     return (
       <View
-        style={[styles.messageRow, isMe ? styles.rowRight : styles.rowLeft]}
+        style={[styles.messageRow, isMe ? styles.rowRight : styles.rowLeft]}        //my msg(sender) right side other msg left side
       >
         <View
           style={[styles.bubble, isMe ? styles.bubbleRight : styles.bubbleLeft]}
@@ -179,11 +183,11 @@ export default ChatScreen;
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
+    backgroundColor: COLORS.white,
   },
   listContent: {
-    paddingHorizontal: 12,
-    paddingVertical: 8,
+    paddingHorizontal: SPACING.exsmall,
+    paddingVertical: SPACING.xsmall,
   },
   messageRow: {
     marginVertical: 3,
@@ -197,22 +201,21 @@ const styles = StyleSheet.create({
   },
   bubble: {
     maxWidth: '75%',
-    borderRadius: 16,
-    paddingHorizontal: 12,
-    paddingTop: 8,
-    paddingBottom: 4,
+    borderRadius: RADIUS.md,
+    paddingHorizontal: SPACING.exsmall,
+    paddingTop: SPACING.xsmall,
+    paddingBottom: SPACING.x,
   },
   bubbleRight: {
-    backgroundColor: '#002DE3',
-    borderBottomRightRadius: 4,
+    backgroundColor: COLORS.primary,
+    borderBottomRightRadius: SPACING.x,
   },
   bubbleLeft: {
-    backgroundColor: '#E9E9EB',
-    borderBottomLeftRadius: 4,
+    backgroundColor: COLORS.secondary,
+    borderBottomLeftRadius: SPACING.x,
   },
   messageText: {
-    fontSize: 16,
-    lineHeight: 22,
+    fontSize: TYPOGRAPHY.button,
   },
   textRight: {
     color: '#fff',

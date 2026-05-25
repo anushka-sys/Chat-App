@@ -8,6 +8,9 @@ const SPACING = {
   xxl: 48,
   small : 14,
   med : 20,
+  exsmall:12,
+  xsmall:8,
+  x:4,
 
 };
 
