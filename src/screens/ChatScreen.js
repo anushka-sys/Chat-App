@@ -8,11 +8,13 @@ import {
   Platform,
   StyleSheet,
   KeyboardAvoidingView,
+  Linking,
 } from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
 import { useHeaderHeight } from '@react-navigation/elements';
 import auth from '@react-native-firebase/auth';
 import firestore from '@react-native-firebase/firestore';
+import { getLinkPreview } from 'link-preview-js';
 
 import COLORS from '../constants/colors';
 import SPACING from '../constants/spacing';
@@ -23,10 +25,18 @@ const ChatScreen = ({ route }) => {
   const [messages, setMessages] = useState([]);
   const [senderName, setSenderName] = useState('');
   const [inputText, setInputText] = useState('');
+    const [previewUrl, setPreviewUrl] = useState('');
 
   const headerHeight = useHeaderHeight();
   const currentUser = auth().currentUser;
   const conversationId = [currentUser.uid, receiverUid].sort().join('_'); //creates a unique chat roomid
+
+    // Helper: extract first URL from text
+  function extractUrl(text) {
+    const urlRegex = /(https?:\/\/[^\s]+)/g;
+    const match = text.match(urlRegex);
+    return match ? match[0] : null;
+  }
 
   useEffect(() => {               //fetch currently logged in user's name
     firestore()     
@@ -75,6 +85,8 @@ const ChatScreen = ({ route }) => {
     const text = inputText.trim();
     if (!text) return;    //check if empty
     setInputText('');
+    setPreviewUrl(''); 
+
     const newMessage = {                                   //message object
       _id: firestore().collection('_').doc().id,
       text: text,
@@ -102,6 +114,7 @@ const ChatScreen = ({ route }) => {
   function renderMessage({ item }) {
     // console.log(item)
     const isMe = item.user?._id === currentUser.uid;
+     const urlInMessage = extractUrl(item.text);
 
     return (
       <View
@@ -126,6 +139,7 @@ const ChatScreen = ({ route }) => {
           >
             {item.text}
           </Text>
+           {urlInMessage && <LinkPreviewCard url={urlInMessage} />}
           <Text
             style={[styles.timeText, isMe ? styles.timeRight : styles.timeLeft]}
           >
@@ -156,11 +170,27 @@ const ChatScreen = ({ route }) => {
         ListEmptyComponent={<Text style={styles.emptyText}>No messages yet</Text>}
       />
 
+           {previewUrl ? (
+        <View style={previewStyles.previewWrapper}>
+          <LinkPreviewCard url={previewUrl} />
+          <TouchableOpacity
+            style={previewStyles.closeButton}
+            onPress={() => setPreviewUrl('')}
+          >
+            <Icon name="close-circle" size={20} color="#555" />
+          </TouchableOpacity>
+        </View>
+      ) : null}
+
       <View style={styles.inputBar}>
         <TextInput
           style={styles.textInput}
           value={inputText}
-          onChangeText={setInputText}
+           onChangeText={text => {
+            setInputText(text);
+            const url = extractUrl(text);
+            setPreviewUrl(url || ''); // update preview URL state as user types
+          }}
           placeholder="Type a message..."
           placeholderTextColor="#494949"
           multiline

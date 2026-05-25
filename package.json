@@ -20,6 +20,7 @@
     "@react-navigation/bottom-tabs": "^7.16.1",
     "@react-navigation/native": "^7.2.4",
     "@react-navigation/stack": "^7.8.13",
+    "link-preview-js": "^4.0.3",
     "react": "19.2.3",
     "react-native": "0.85.0",
     "react-native-dotenv": "^3.4.11",
