@@ -4,13 +4,13 @@ import { ThemeContext } from '../context/ThemeContext';
 import { useContext } from 'react';
 
 const SearchBar = ({ value, onChangeText }) => {
-    const { isDark, theme } = useContext(ThemeContext);
-    const styles = getStyles(theme);
+  const { isDark, theme } = useContext(ThemeContext);
+  const styles = getStyles(theme);
   return (
     <View style={styles.container}>
       <Icon name="search-outline" size={18} color="#999" style={styles.icon} />
       <TextInput
-        style={styles.input}
+        style={[styles.input, { color: theme.color }]}
         value={value}
         onChangeText={onChangeText}
         placeholder="Search users..."
@@ -22,24 +22,24 @@ const SearchBar = ({ value, onChangeText }) => {
 
 const getStyles = theme =>
   StyleSheet.create({
-  container: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: theme.backgroundMuted,
-    borderRadius: 8,
-    marginHorizontal: 16,
-    marginVertical: 10,
-    paddingHorizontal: 10,
-  },
-  icon: {
-    marginRight: 8,
-  },
-  input: {
-    flex: 1,
-    paddingVertical: 10,
-    fontSize: 15,
-    color: '#1a1a1a',
-  },
-});
+    container: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      backgroundColor: theme.backgroundMuted,
+      borderRadius: 8,
+      marginHorizontal: 16,
+      marginVertical: 10,
+      paddingHorizontal: 10,
+    },
+    icon: {
+      marginRight: 8,
+    },
+    input: {
+      flex: 1,
+      paddingVertical: 10,
+      fontSize: 15,
+      color: '#1a1a1a',
+    },
+  });
 
 export default SearchBar;

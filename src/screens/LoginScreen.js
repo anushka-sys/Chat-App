@@ -6,7 +6,7 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
-import React, { useState,useContext } from 'react';
+import React, { useState, useContext } from 'react';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
 import {
@@ -15,14 +15,13 @@ import {
 } from '@react-native-firebase/auth';
 import { ThemeContext } from '../context/ThemeContext';
 
-
 import COLORS from '../constants/colors';
 import SPACING from '../constants/spacing';
 import { TYPOGRAPHY, RADIUS, fontWeight } from '../constants/typograph';
 
 const LoginScreen = () => {
-   const { isDark ,theme} = useContext(ThemeContext);
-         const styles = getStyles(theme);
+  const { isDark, theme } = useContext(ThemeContext);
+  const styles = getStyles(theme);
   const navigation = useNavigation();
 
   const [email, setEmail] = useState('');
@@ -121,71 +120,71 @@ export default LoginScreen;
 
 const getStyles = theme =>
   StyleSheet.create({
-  safe: {
-    flex: 1,
-    backgroundColor: theme.backgroundPrimary,
-  },
+    safe: {
+      flex: 1,
+      backgroundColor: theme.backgroundPrimary,
+    },
 
-  container: {
-    flex: 1,
-    alignItems: 'center',
-    paddingHorizontal: SPACING.lg,
-    paddingTop: SPACING.xxl,
-  },
+    container: {
+      flex: 1,
+      alignItems: 'center',
+      paddingHorizontal: SPACING.lg,
+      paddingTop: SPACING.xxl,
+    },
 
-  title: {
-    fontSize: TYPOGRAPHY.title,
-    fontWeight: fontWeight.l,
-    color: COLORS.primary,
-    paddingBottom: SPACING.xs,
-    textAlign: 'center',
-  },
+    title: {
+      fontSize: TYPOGRAPHY.title,
+      fontWeight: fontWeight.l,
+      color: COLORS.primary,
+      paddingBottom: SPACING.xs,
+      textAlign: 'center',
+    },
 
-  subtitle: {
-    fontSize: TYPOGRAPHY.subtitle,
-    color: theme.text,
-    textAlign: 'center',
-    paddingBottom: SPACING.xxxl,
-    paddingHorizontal: SPACING.md,
-  },
+    subtitle: {
+      fontSize: TYPOGRAPHY.subtitle,
+      color: theme.text,
+      textAlign: 'center',
+      paddingBottom: SPACING.xxxl,
+      paddingHorizontal: SPACING.md,
+    },
 
-  inputWrap: {
-    width: '90%',
-    borderWidth: 1.5,
-    borderColor: '#D0D5E8',
-    borderRadius: RADIUS.xs,
-    marginBottom: SPACING.md,
-    backgroundColor: theme.backgroundMuted,
-  },
+    inputWrap: {
+      width: '90%',
+      borderWidth: 1.5,
+      borderColor: '#D0D5E8',
+      borderRadius: RADIUS.xs,
+      marginBottom: SPACING.md,
+      backgroundColor: theme.backgroundMuted,
+    },
 
-  input: {
-    paddingVertical: SPACING.small,
-    paddingHorizontal: SPACING.md,
-    fontSize: TYPOGRAPHY.input,
-    color: COLORS.input,
-  },
+    input: {
+      paddingVertical: SPACING.small,
+      paddingHorizontal: SPACING.md,
+      fontSize: TYPOGRAPHY.input,
+      color: COLORS.input,
+    },
 
-  buttoncontainer: {
-    width: '90%',
-    backgroundColor: COLORS.primary,
-    borderRadius: RADIUS.xl,
-    paddingVertical: 15,
-    alignItems: 'center',
-    marginTop: SPACING.med,
-  },
+    buttoncontainer: {
+      width: '90%',
+      backgroundColor: COLORS.primary,
+      borderRadius: RADIUS.xl,
+      paddingVertical: 15,
+      alignItems: 'center',
+      marginTop: SPACING.med,
+    },
 
-  buttonText: {
-    color: COLORS.white,
-    fontSize: TYPOGRAPHY.button,
-    fontWeight: fontWeight.m,
-  },
+    buttonText: {
+      color: COLORS.white,
+      fontSize: TYPOGRAPHY.button,
+      fontWeight: fontWeight.m,
+    },
 
-  signupLink: {
-    paddingTop: 18,
-  },
+    signupLink: {
+      paddingTop: 18,
+    },
 
-  signupText: {
-    color: theme.text,
-    fontSize: TYPOGRAPHY.subtitle,
-  },
-});
+    signupText: {
+      color: theme.text,
+      fontSize: TYPOGRAPHY.subtitle,
+    },
+  });

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState,useContext } from 'react';
 import {
   View,
   Text,
@@ -14,12 +14,15 @@ import { useHeaderHeight } from '@react-navigation/elements';
 import auth from '@react-native-firebase/auth';
 import firestore from '@react-native-firebase/firestore';
 import LinkPreviewCard from '../components/LinkPreviewCard';
+import { ThemeContext } from '../context/ThemeContext';
 
 import COLORS from '../constants/colors';
 import SPACING from '../constants/spacing';
 import { TYPOGRAPHY, RADIUS, fontWeight } from '../constants/typograph';
 
 const ChatScreen = ({ route }) => {
+     const { isDark ,theme} = useContext(ThemeContext);
+           const styles = getStyles(theme);
   const { receiverUid } = route.params;
   const [messages, setMessages] = useState([]);
   const [senderName, setSenderName] = useState('');
@@ -240,10 +243,12 @@ const inputPreviewStyles = StyleSheet.create({
   },
 });
 
-const styles = StyleSheet.create({
+
+const getStyles = theme =>
+  StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: COLORS.white,
+    backgroundColor: theme.backgroundPrimary,
   },
   listContent: {
     paddingHorizontal: SPACING.exsmall,
