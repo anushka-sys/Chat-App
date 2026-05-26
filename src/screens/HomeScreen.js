@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo,useContext } from 'react';
 import {
   View,
   Text,
@@ -13,8 +13,11 @@ import { useNavigation } from '@react-navigation/native';
 import firestore from '@react-native-firebase/firestore';
 import auth from '@react-native-firebase/auth';
 import SearchBar from '../components/SearchBar';
+import { ThemeContext } from '../context/ThemeContext';
 
 const HomeScreen = () => {
+  const { isDark ,theme} = useContext(ThemeContext);
+     const styles = getStyles(theme);
   const navigation = useNavigation();
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -126,10 +129,10 @@ const HomeScreen = () => {
 };
 
 export default HomeScreen;
-const styles = StyleSheet.create({
+const getStyles = theme => StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
+    backgroundColor: theme.backgroundPrimary,
     paddingTop: 10,
   },
 
@@ -152,7 +155,7 @@ const styles = StyleSheet.create({
   headerTitle: {
     fontSize: 23,
     fontWeight: '500',
-    color: '#000',
+    color: theme.textPrimary,
   },
 
   addBtn: {
@@ -165,7 +168,7 @@ const styles = StyleSheet.create({
 
   addIcon: {
     fontSize: 20,
-    color: '#000000',
+    color: theme.textPrimary,
     fontWeight: '600',
   },
 
@@ -223,7 +226,7 @@ const styles = StyleSheet.create({
   userName: {
     fontSize: 16,
     fontWeight: '600',
-    color: '#000',
+    color: theme.textPrimary,
   },
 
   subtitle: {

@@ -1,8 +1,11 @@
 import React from 'react';
 import { View, TextInput, StyleSheet } from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
+import { ThemeContext } from '../context/ThemeContext';
 
 const SearchBar = ({ value, onChangeText }) => {
+    const { isDark, toggleTheme, theme } = useContext(ThemeContext);
+    const styles = getStyles(theme);
   return (
     <View style={styles.container}>
       <Icon name="search-outline" size={18} color="#999" style={styles.icon} />
@@ -17,7 +20,8 @@ const SearchBar = ({ value, onChangeText }) => {
   );
 };
 
-const styles = StyleSheet.create({
+const getStyles = theme =>
+  StyleSheet.create({
   container: {
     flexDirection: 'row',
     alignItems: 'center',
