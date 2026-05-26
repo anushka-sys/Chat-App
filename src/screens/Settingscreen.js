@@ -7,7 +7,7 @@ import {
   ScrollView,
   Switch,
 } from 'react-native';
-import React, { useState,useContext } from 'react';
+import React, { useContext } from 'react';
 import auth from '@react-native-firebase/auth';
 import { useNavigation } from '@react-navigation/native';
 import Icon from 'react-native-vector-icons/Ionicons';
@@ -21,7 +21,6 @@ const SettingScreen = () => {
   const displayName = currentUser?.displayName || currentUser?.email?.split('@')[0] || 'User';
   const avatarLetter = displayName?.charAt(0).toUpperCase();
 
- // const [isDarkMode, setIsDarkMode] = useState(false);
 
   const handleLogout = async () => {
     try {
@@ -151,7 +150,7 @@ const getStyles = (theme) => StyleSheet.create({
   userName: {
     fontSize: 20,
     fontWeight: '700',
-    color: '#1a1a1a',
+    color: theme.textPrimary,
     marginBottom: 4,
   },
   userEmail: {
@@ -160,10 +159,10 @@ const getStyles = (theme) => StyleSheet.create({
   },
   optionsList: {
     marginHorizontal: 20,
-    backgroundColor: '#fff',
+    backgroundColor: theme.backgroundMuted,
     borderRadius: 16,
     borderWidth: 1,
-    borderColor: '#e5e5e5',
+    borderColor: theme.backgroundMuted,
     overflow: 'hidden',
     marginBottom: 28,
   },
