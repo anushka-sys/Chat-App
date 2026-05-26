@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo,useContext } from 'react';
+import React, { useState, useEffect, useMemo, useContext } from 'react';
 import {
   View,
   Text,
@@ -16,8 +16,8 @@ import SearchBar from '../components/SearchBar';
 import { ThemeContext } from '../context/ThemeContext';
 
 const HomeScreen = () => {
-  const { isDark ,theme} = useContext(ThemeContext);
-     const styles = getStyles(theme);
+  const { isDark, theme } = useContext(ThemeContext);
+  const styles = getStyles(theme);
   const navigation = useNavigation();
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -26,13 +26,14 @@ const HomeScreen = () => {
 
   useEffect(() => {
     const unsubscribe = firestore()
-      .collection('users')            //fetch users
-      .limit(30) 
-      .onSnapshot(snapshot => {   ///creates realtimelistner
+      .collection('users') //fetch users
+      .limit(30)
+      .onSnapshot(snapshot => {
+        ///creates realtimelistner
         const allUsers = snapshot.docs
           .map(doc => ({
             id: doc.id,
-            ...doc.data(),             //spreads all firestore fields into onj
+            ...doc.data(), //spreads all firestore fields into onj
           }))
           .filter(user => user.uid !== currentUid); //filter current user
 
@@ -60,7 +61,6 @@ const HomeScreen = () => {
         })
       }
     >
-      
       <View style={styles.avatarWrapper}>
         {item.image ? (
           <Image source={{ uri: item.image }} style={styles.avatarImg} />
@@ -72,11 +72,9 @@ const HomeScreen = () => {
           </View>
         )}
 
-        
         {item.isOnline && <View style={styles.onlineDot} />}
       </View>
 
-   
       <View style={styles.textWrapper}>
         <Text style={styles.userName}>{item.name}</Text>
         <Text style={styles.subtitle}>Tap to chat</Text>
@@ -96,7 +94,6 @@ const HomeScreen = () => {
     <View style={styles.container}>
       <StatusBar barStyle="dark-content" />
 
-      
       <View style={styles.header}>
         <Text style={styles.headerTitle}>Contacts</Text>
 
@@ -105,10 +102,8 @@ const HomeScreen = () => {
         </TouchableOpacity>
       </View>
 
-   
       <SearchBar value={searchQuery} onChangeText={setsearchQuery} />
 
-     
       <FlatList
         data={filteredUsers}
         keyExtractor={item => item.uid}
@@ -129,115 +124,117 @@ const HomeScreen = () => {
 };
 
 export default HomeScreen;
-const getStyles = theme => StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: theme.backgroundPrimary,
-    paddingTop: 10,
-  },
 
-  loader: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
+const getStyles = theme =>
+  StyleSheet.create({
+    container: {
+      flex: 1,
+      backgroundColor: theme.backgroundPrimary,
+      paddingTop: 30,
+    },
 
-  /* HEADER */
+    loader: {
+      flex: 1,
+      justifyContent: 'center',
+      alignItems: 'center',
+    },
 
-  header: {
-    paddingHorizontal: 20,
-    // marginBottom: 10,
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-  },
+    /* HEADER */
 
-  headerTitle: {
-    fontSize: 23,
-    fontWeight: '500',
-    color: theme.textPrimary,
-  },
+    header: {
+      paddingHorizontal: 20,
+      // marginBottom: 10,
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      alignItems: 'center',
+    },
 
-  addBtn: {
-    width: 36,
-    height: 36,
-    borderRadius: 18,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
+    headerTitle: {
+      fontSize: 23,
+      fontWeight: '500',
+      color: theme.textPrimary,
+    },
 
-  addIcon: {
-    fontSize: 20,
-    color: theme.textPrimary,
-    fontWeight: '600',
-  },
+    addBtn: {
+      width: 36,
+      height: 36,
+      borderRadius: 18,
+      justifyContent: 'center',
+      alignItems: 'center',
+    },
 
-  /* USER ROW */
+    addIcon: {
+      fontSize: 20,
+      color: theme.textPrimary,
+      fontWeight: '600',
+    },
 
-  userRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingHorizontal: 20,
-    paddingVertical: 14,
-  },
+    /* USER ROW */
 
-  avatarWrapper: {
-    position: 'relative',
-  },
+    userRow: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      paddingHorizontal: 20,
+      paddingVertical: 14,
+    },
 
-  avatarImg: {
-    width: 58,
-    height: 58,
-    borderRadius: 16,
-  },
+    avatarWrapper: {
+      position: 'relative',
+    },
 
-  avatarPlaceholder: {
-    width: 58,
-    height: 58,
-    borderRadius: 16,
-    backgroundColor: '#002DE3',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
+    avatarImg: {
+      width: 58,
+      height: 58,
+      borderRadius: 16,
+    },
 
-  avatarText: {
-    color: '#fff',
-    fontSize: 20,
-    fontWeight: '700',
-  },
+    avatarPlaceholder: {
+      width: 58,
+      height: 58,
+      borderRadius: 16,
+      backgroundColor: '#002DE3',
+      justifyContent: 'center',
+      alignItems: 'center',
+    },
 
-  onlineDot: {
-    position: 'absolute',
-    bottom: 2,
-    right: 2,
-    width: 14,
-    height: 14,
-    borderRadius: 7,
-    backgroundColor: '#22C55E',
-    borderWidth: 2,
-    borderColor: '#fff',
-  },
+    avatarText: {
+      color: '#fff',
+      fontSize: 20,
+      fontWeight: '700',
+    },
 
-  textWrapper: {
-    marginLeft: 14,
-    flex: 1,
-  },
+    onlineDot: {
+      position: 'absolute',
+      bottom: 2,
+      right: 2,
+      width: 14,
+      height: 14,
+      borderRadius: 7,
+      backgroundColor: '#22C55E',
+      borderWidth: 2,
+      borderColor: '#fff',
+    },
 
-  userName: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: theme.textPrimary,
-  },
+    textWrapper: {
+      marginLeft: 14,
+      flex: 1,
+    },
 
-  subtitle: {
-    marginTop: 4,
-    fontSize: 13,
-    color: '#8E8E93',
-  },
+    userName: {
+      fontSize: 16,
+      fontWeight: '600',
+      color: theme.textPrimary,
+    },
 
-  emptyText: {
-    textAlign: 'center',
-    marginTop: 40,
-    color: '#999',
-  },
-});
+    subtitle: {
+      marginTop: 4,
+      fontSize: 13,
+      color: '#8E8E93',
+    },
+
+    emptyText: {
+      textAlign: 'center',
+      marginTop: 40,
+      color: '#999',
+    },
+  });

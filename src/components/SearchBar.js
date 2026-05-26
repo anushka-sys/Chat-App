@@ -1,10 +1,10 @@
-import React from 'react';
 import { View, TextInput, StyleSheet } from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
 import { ThemeContext } from '../context/ThemeContext';
+import { useContext } from 'react';
 
 const SearchBar = ({ value, onChangeText }) => {
-    const { isDark, toggleTheme, theme } = useContext(ThemeContext);
+    const { isDark, theme } = useContext(ThemeContext);
     const styles = getStyles(theme);
   return (
     <View style={styles.container}>
@@ -25,7 +25,7 @@ const getStyles = theme =>
   container: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#f2f2f2',
+    backgroundColor: theme.backgroundMuted,
     borderRadius: 8,
     marginHorizontal: 16,
     marginVertical: 10,

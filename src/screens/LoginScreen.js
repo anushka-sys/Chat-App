@@ -6,19 +6,23 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
-import React, { useState } from 'react';
+import React, { useState,useContext } from 'react';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
 import {
   getAuth,
   signInWithEmailAndPassword,
 } from '@react-native-firebase/auth';
+import { ThemeContext } from '../context/ThemeContext';
+
 
 import COLORS from '../constants/colors';
 import SPACING from '../constants/spacing';
 import { TYPOGRAPHY, RADIUS, fontWeight } from '../constants/typograph';
 
 const LoginScreen = () => {
+   const { isDark ,theme} = useContext(ThemeContext);
+         const styles = getStyles(theme);
   const navigation = useNavigation();
 
   const [email, setEmail] = useState('');
@@ -115,10 +119,11 @@ const LoginScreen = () => {
 
 export default LoginScreen;
 
-const styles = StyleSheet.create({
+const getStyles = theme =>
+  StyleSheet.create({
   safe: {
     flex: 1,
-    backgroundColor: COLORS.white,
+    backgroundColor: theme.backgroundPrimary,
   },
 
   container: {
@@ -138,7 +143,7 @@ const styles = StyleSheet.create({
 
   subtitle: {
     fontSize: TYPOGRAPHY.subtitle,
-    color: '#4A4A4A',
+    color: theme.text,
     textAlign: 'center',
     paddingBottom: SPACING.xxxl,
     paddingHorizontal: SPACING.md,
@@ -150,7 +155,7 @@ const styles = StyleSheet.create({
     borderColor: '#D0D5E8',
     borderRadius: RADIUS.xs,
     marginBottom: SPACING.md,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: theme.backgroundMuted,
   },
 
   input: {
@@ -180,7 +185,7 @@ const styles = StyleSheet.create({
   },
 
   signupText: {
-    color: COLORS.subtitle,
+    color: theme.text,
     fontSize: TYPOGRAPHY.subtitle,
   },
 });
