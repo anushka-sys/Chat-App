@@ -1,4 +1,4 @@
-import React, { useEffect, useState,useContext } from 'react';
+import React, { useEffect, useState, useContext } from 'react';
 import {
   View,
   Text,
@@ -21,8 +21,8 @@ import SPACING from '../constants/spacing';
 import { TYPOGRAPHY, RADIUS, fontWeight } from '../constants/typograph';
 
 const ChatScreen = ({ route }) => {
-     const { isDark ,theme} = useContext(ThemeContext);
-           const styles = getStyles(theme);
+  const { isDark, theme } = useContext(ThemeContext);
+  const styles = getStyles(theme);
   const { receiverUid } = route.params;
   const [messages, setMessages] = useState([]);
   const [senderName, setSenderName] = useState('');
@@ -187,7 +187,7 @@ const ChatScreen = ({ route }) => {
       {previewUrl ? (
         <View style={inputPreviewStyles.wrapper}>
           <LinkPreviewCard url={previewUrl} />
-          {/* ✅ X button clears the previewUrl state and hides the banner */}
+          {/*  X button clears the previewUrl state and hides the banner */}
           <TouchableOpacity
             style={inputPreviewStyles.closeButton}
             onPress={() => setPreviewUrl('')}
@@ -203,7 +203,7 @@ const ChatScreen = ({ route }) => {
           value={inputText}
           onChangeText={text => {
             setInputText(text);
-            // ✅ Detect URL on every keystroke and update previewUrl state
+            //  Detect URL on every keystroke and update previewUrl state
             const url = extractUrl(text);
             setPreviewUrl(url || '');
           }}
@@ -243,110 +243,109 @@ const inputPreviewStyles = StyleSheet.create({
   },
 });
 
-
 const getStyles = theme =>
   StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: theme.backgroundPrimary,
-  },
-  listContent: {
-    paddingHorizontal: SPACING.exsmall,
-    paddingVertical: SPACING.xsmall,
-  },
-  messageRow: {
-    marginVertical: 3,
-    flexDirection: 'row',
-  },
-  rowRight: {
-    justifyContent: 'flex-end',
-  },
-  rowLeft: {
-    justifyContent: 'flex-start',
-  },
-  bubble: {
-    maxWidth: '75%',
-    borderRadius: RADIUS.md,
-    paddingHorizontal: SPACING.exsmall,
-    paddingTop: SPACING.xsmall,
-    paddingBottom: SPACING.x,
-  },
-  bubbleRight: {
-    backgroundColor: COLORS.primary,
-    borderBottomRightRadius: SPACING.x,
-  },
-  bubbleLeft: {
-    backgroundColor: COLORS.secondary,
-    borderBottomLeftRadius: SPACING.x,
-  },
-  messageText: {
-    fontSize: TYPOGRAPHY.button,
-  },
-  textRight: {
-    color: '#fff',
-  },
-  textLeft: {
-    color: '#000',
-  },
-  timeText: {
-    fontSize: 11,
-    marginTop: 2,
-    alignSelf: 'flex-end',
-  },
-  timeRight: {
-    color: 'rgba(255,255,255,0.65)',
-  },
-  timeLeft: {
-    color: '#999',
-  },
-  inputBar: {
-    flexDirection: 'row',
-    alignItems: 'flex-end',
-    paddingHorizontal: 10,
-    paddingVertical: 8,
-    backgroundColor: '#ffffff',
-    elevation: 10,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: -3 },
-    shadowOpacity: 0.08,
-    shadowRadius: 6,
-  },
-  textInput: {
-    flex: 1,
-    backgroundColor: '#e7e7e7',
-    borderRadius: 25,
-    paddingHorizontal: 19,
-    paddingVertical: 10,
-    fontSize: 16,
-    color: '#040404',
-    maxHeight: 120,
-    marginRight: 8,
-    // paddingBottom:5,
-  },
-  sendButton: {
-    backgroundColor: '#002DE3',
-    width: 42,
-    height: 42,
-    borderRadius: 21,
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginBottom: Platform.OS === 'ios' ? 0 : 2,
-  },
-  sendButtonDisabled: {
-    backgroundColor: '#555',
-  },
-  senderName: {
-    fontSize: 12,
-    fontWeight: '600',
-    color: '#555',
-    marginBottom: 3,
-  },
-  emptyText: {
-    textAlign: 'center',
-    marginTop: 40,
-    color: '#999',
-  },
-  senderNameRight: {
-    color: '#ffffff',
-  },
-});
+    container: {
+      flex: 1,
+      backgroundColor: theme.backgroundPrimary,
+    },
+    listContent: {
+      paddingHorizontal: SPACING.exsmall,
+      paddingVertical: SPACING.xsmall,
+    },
+    messageRow: {
+      marginVertical: 3,
+      flexDirection: 'row',
+    },
+    rowRight: {
+      justifyContent: 'flex-end',
+    },
+    rowLeft: {
+      justifyContent: 'flex-start',
+    },
+    bubble: {
+      maxWidth: '75%',
+      borderRadius: RADIUS.md,
+      paddingHorizontal: SPACING.exsmall,
+      paddingTop: SPACING.xsmall,
+      paddingBottom: SPACING.x,
+    },
+    bubbleRight: {
+      backgroundColor: COLORS.primary,
+      borderBottomRightRadius: SPACING.x,
+    },
+    bubbleLeft: {
+      backgroundColor: COLORS.secondary,
+      borderBottomLeftRadius: SPACING.x,
+    },
+    messageText: {
+      fontSize: TYPOGRAPHY.button,
+    },
+    textRight: {
+      color: '#fff',
+    },
+    textLeft: {
+      color: '#000',
+    },
+    timeText: {
+      fontSize: 11,
+      marginTop: 2,
+      alignSelf: 'flex-end',
+    },
+    timeRight: {
+      color: 'rgba(255,255,255,0.65)',
+    },
+    timeLeft: {
+      color: '#999',
+    },
+    inputBar: {
+      flexDirection: 'row',
+      alignItems: 'flex-end',
+      paddingHorizontal: 10,
+      paddingVertical: 8,
+      backgroundColor: theme.backgroundPrimary,
+      elevation: 10,
+      shadowColor: '#000',
+      shadowOffset: { width: 0, height: -3 },
+      shadowOpacity: 0.08,
+      shadowRadius: 6,
+    },
+    textInput: {
+      flex: 1,
+      backgroundColor: theme.backgroundMuted,
+      borderRadius: 25,
+      paddingHorizontal: 19,
+      paddingVertical: 10,
+      fontSize: 16,
+      color: '#040404',
+      maxHeight: 120,
+      marginRight: 8,
+      // paddingBottom:5,
+    },
+    sendButton: {
+      backgroundColor: '#002DE3',
+      width: 42,
+      height: 42,
+      borderRadius: 21,
+      justifyContent: 'center',
+      alignItems: 'center',
+      marginBottom: Platform.OS === 'ios' ? 0 : 2,
+    },
+    sendButtonDisabled: {
+      backgroundColor: '#555',
+    },
+    senderName: {
+      fontSize: 12,
+      fontWeight: '600',
+      color: '#555',
+      marginBottom: 3,
+    },
+    emptyText: {
+      textAlign: 'center',
+      marginTop: 40,
+      color: '#999',
+    },
+    senderNameRight: {
+      color: '#ffffff',
+    },
+  });
