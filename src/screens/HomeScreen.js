@@ -1,4 +1,9 @@
-import React, { useState, useEffect, useMemo, useContext } from 'react';
+import React, {
+  useState,
+  useEffect,
+  useMemo,
+  useContext,
+} from 'react';
 import {
   View,
   Text,
@@ -16,14 +21,16 @@ import SearchBar from '../components/SearchBar';
 import { ThemeContext } from '../context/ThemeContext';
 
 const HomeScreen = () => {
-  const { isDark, theme } = useContext(ThemeContext);
+  const { theme } = useContext(ThemeContext);
   const styles = getStyles(theme);
+
   const navigation = useNavigation();
+
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setsearchQuery] = useState('');
-  // NEW: map of conversationId -> { lastMessage, unreadCount }
   const [convMeta, setConvMeta] = useState({});
+
   const currentUid = auth().currentUser?.uid;
 
   useEffect(() => {
@@ -32,15 +39,20 @@ const HomeScreen = () => {
       .limit(30)
       .onSnapshot(snapshot => {
         const allUsers = snapshot.docs
-          .map(doc => ({ id: doc.id, ...doc.data() }))
+          .map(doc => ({
+            id: doc.id,
+            ...doc.data(),
+          }))
           .filter(user => user.uid !== currentUid);
+
         setUsers(allUsers);
         setLoading(false);
       });
+
     return () => unsubscribe();
   }, [currentUid]);
 
-  // NEW: listen to all conversations that involve current user
+  // Realtime conversation metadata
   useEffect(() => {
     if (!currentUid) return;
 
@@ -49,14 +61,20 @@ const HomeScreen = () => {
       .where('members', 'array-contains', currentUid)
       .onSnapshot(snapshot => {
         const meta = {};
+
         snapshot.docs.forEach(doc => {
           const data = doc.data();
+
           meta[doc.id] = {
-            lastMessageText: data.lastMessageText || '',
-            lastMessageAt: data.lastMessageAt?.toDate() || null,
-            unreadCount: data.unreadCounts?.[currentUid] || 0,
+            lastMessageText:
+              data.lastMessageText || '',
+            lastMessageAt:
+              data.lastMessageAt?.toDate() || null,
+            unreadCount:
+              data.unreadCounts?.[currentUid] || 0,
           };
         });
+
         setConvMeta(meta);
       });
 
@@ -66,30 +84,56 @@ const HomeScreen = () => {
   const filteredUsers = useMemo(() => {
     return users
       .filter(user =>
-        user.name?.toLowerCase().includes(searchQuery.toLowerCase()),
+        user.name
+          ?.toLowerCase()
+          .includes(searchQuery.toLowerCase()),
       )
       .map(user => {
-        const convId = [currentUid, user.uid].sort().join('_');
-        return { ...user, ...convMeta[convId] };
+        const convId = [currentUid, user.uid]
+          .sort()
+          .join('_');
+
+        return {
+          ...user,
+          ...convMeta[convId],
+        };
       })
-      // Sort by most recent message first
       .sort((a, b) => {
         const tA = a.lastMessageAt?.getTime() || 0;
         const tB = b.lastMessageAt?.getTime() || 0;
+
         return tB - tA;
       });
   }, [users, searchQuery, convMeta, currentUid]);
 
   function formatTime(date) {
     if (!date) return '';
+
     const now = new Date();
-    const diffDays = Math.floor((now - date) / 86400000);
-    if (diffDays === 0)
-      return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
+    const diffDays = Math.floor(
+      (now - date) / 86400000,
+    );
+
+    if (diffDays === 0) {
+      return date.toLocaleTimeString([], {
+        hour: '2-digit',
+        minute: '2-digit',
+      });
+    }
+
     if (diffDays === 1) return 'Yesterday';
-    if (diffDays < 7)
-      return date.toLocaleDateString([], { weekday: 'short' });
-    return date.toLocaleDateString([], { month: 'short', day: 'numeric' });
+
+    if (diffDays < 7) {
+      return date.toLocaleDateString([], {
+        weekday: 'short',
+      });
+    }
+
+    return date.toLocaleDateString([], {
+      month: 'short',
+      day: 'numeric',
+    });
   }
 
   const renderItem = ({ item }) => (
@@ -105,37 +149,51 @@ const HomeScreen = () => {
     >
       <View style={styles.avatarWrapper}>
         {item.image ? (
-          <Image source={{ uri: item.image }} style={styles.avatarImg} />
+          <Image
+            source={{ uri: item.image }}
+            style={styles.avatarImg}
+          />
         ) : (
           <View style={styles.avatarPlaceholder}>
             <Text style={styles.avatarText}>
-              {item.name?.charAt(0).toUpperCase()}
+              {item.name
+                ?.charAt(0)
+                .toUpperCase()}
             </Text>
           </View>
         )}
-        {item.isOnline && <View style={styles.onlineDot} />}
+
+        {item.isOnline && (
+          <View style={styles.onlineDot} />
+        )}
       </View>
 
       <View style={styles.textWrapper}>
-        {/* Row: name + timestamp */}
         <View style={styles.topRow}>
           <Text
-            style={[styles.userName, item.unreadCount > 0 && styles.userNameBold]}
+            style={[
+              styles.userName,
+              item.unreadCount > 0 &&
+                styles.userNameBold,
+            ]}
             numberOfLines={1}
           >
             {item.name}
           </Text>
+
           {item.lastMessageAt ? (
-            <Text style={styles.timeLabel}>{formatTime(item.lastMessageAt)}</Text>
+            <Text style={styles.timeLabel}>
+              {formatTime(item.lastMessageAt)}
+            </Text>
           ) : null}
         </View>
 
-        {/* Row: last message preview + unread badge */}
         <View style={styles.bottomRow}>
           <Text
             style={[
               styles.subtitle,
-              item.unreadCount > 0 && styles.subtitleUnread,
+              item.unreadCount > 0 &&
+                styles.subtitleUnread,
             ]}
             numberOfLines={1}
             ellipsizeMode="tail"
@@ -143,11 +201,12 @@ const HomeScreen = () => {
             {item.lastMessageText || 'Tap to chat'}
           </Text>
 
-          {/* NEW: unread badge */}
           {item.unreadCount > 0 && (
             <View style={styles.badge}>
               <Text style={styles.badgeText}>
-                {item.unreadCount > 99 ? '99+' : item.unreadCount}
+                {item.unreadCount > 99
+                  ? '99+'
+                  : item.unreadCount}
               </Text>
             </View>
           )}
@@ -159,7 +218,10 @@ const HomeScreen = () => {
   if (loading) {
     return (
       <View style={styles.loader}>
-        <ActivityIndicator size="large" color="#002DE3" />
+        <ActivityIndicator
+          size="large"
+          color="#002DE3"
+        />
       </View>
     );
   }
@@ -169,13 +231,19 @@ const HomeScreen = () => {
       <StatusBar barStyle="dark-content" />
 
       <View style={styles.header}>
-        <Text style={styles.headerTitle}>Contacts</Text>
+        <Text style={styles.headerTitle}>
+          Contacts
+        </Text>
+
         <TouchableOpacity style={styles.addBtn}>
           <Text style={styles.addIcon}>+</Text>
         </TouchableOpacity>
       </View>
 
-      <SearchBar value={searchQuery} onChangeText={setsearchQuery} />
+      <SearchBar
+        value={searchQuery}
+        onChangeText={setsearchQuery}
+      />
 
       <FlatList
         data={filteredUsers}
@@ -189,7 +257,9 @@ const HomeScreen = () => {
         removeClippedSubviews={true}
         keyboardShouldPersistTaps="handled"
         ListEmptyComponent={
-          <Text style={styles.emptyText}>No other users found</Text>
+          <Text style={styles.emptyText}>
+            No other users found
+          </Text>
         }
       />
     </View>
@@ -275,7 +345,6 @@ const getStyles = theme =>
       marginLeft: 14,
       flex: 1,
     },
-    // NEW layout rows
     topRow: {
       flexDirection: 'row',
       justifyContent: 'space-between',
@@ -311,9 +380,8 @@ const getStyles = theme =>
       color: theme.textPrimary,
       fontWeight: '500',
     },
-    // NEW badge
     badge: {
-      backgroundColor: '#002DE3',
+      backgroundColor: '#a6a6a6',
       borderRadius: 10,
       minWidth: 20,
       height: 20,
