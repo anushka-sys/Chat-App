@@ -22,33 +22,75 @@ const HomeScreen = () => {
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setsearchQuery] = useState('');
+  // NEW: map of conversationId -> { lastMessage, unreadCount }
+  const [convMeta, setConvMeta] = useState({});
   const currentUid = auth().currentUser?.uid;
 
   useEffect(() => {
     const unsubscribe = firestore()
-      .collection('users') //fetch users
+      .collection('users')
       .limit(30)
       .onSnapshot(snapshot => {
-        ///creates realtimelistner
         const allUsers = snapshot.docs
-          .map(doc => ({
-            id: doc.id,
-            ...doc.data(), //spreads all firestore fields into onj
-          }))
-          .filter(user => user.uid !== currentUid); //filter current user
-
+          .map(doc => ({ id: doc.id, ...doc.data() }))
+          .filter(user => user.uid !== currentUid);
         setUsers(allUsers);
         setLoading(false);
       });
+    return () => unsubscribe();
+  }, [currentUid]);
 
-    return () => unsubscribe(); //stop listner
+  // NEW: listen to all conversations that involve current user
+  useEffect(() => {
+    if (!currentUid) return;
+
+    const unsubscribe = firestore()
+      .collection('conversations')
+      .where('members', 'array-contains', currentUid)
+      .onSnapshot(snapshot => {
+        const meta = {};
+        snapshot.docs.forEach(doc => {
+          const data = doc.data();
+          meta[doc.id] = {
+            lastMessageText: data.lastMessageText || '',
+            lastMessageAt: data.lastMessageAt?.toDate() || null,
+            unreadCount: data.unreadCounts?.[currentUid] || 0,
+          };
+        });
+        setConvMeta(meta);
+      });
+
+    return () => unsubscribe();
   }, [currentUid]);
 
   const filteredUsers = useMemo(() => {
-    return users.filter(user =>
-      user.name?.toLowerCase().includes(searchQuery.toLowerCase()),
-    );
-  }, [users, searchQuery]);
+    return users
+      .filter(user =>
+        user.name?.toLowerCase().includes(searchQuery.toLowerCase()),
+      )
+      .map(user => {
+        const convId = [currentUid, user.uid].sort().join('_');
+        return { ...user, ...convMeta[convId] };
+      })
+      // Sort by most recent message first
+      .sort((a, b) => {
+        const tA = a.lastMessageAt?.getTime() || 0;
+        const tB = b.lastMessageAt?.getTime() || 0;
+        return tB - tA;
+      });
+  }, [users, searchQuery, convMeta, currentUid]);
+
+  function formatTime(date) {
+    if (!date) return '';
+    const now = new Date();
+    const diffDays = Math.floor((now - date) / 86400000);
+    if (diffDays === 0)
+      return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    if (diffDays === 1) return 'Yesterday';
+    if (diffDays < 7)
+      return date.toLocaleDateString([], { weekday: 'short' });
+    return date.toLocaleDateString([], { month: 'short', day: 'numeric' });
+  }
 
   const renderItem = ({ item }) => (
     <TouchableOpacity
@@ -71,13 +113,45 @@ const HomeScreen = () => {
             </Text>
           </View>
         )}
-
         {item.isOnline && <View style={styles.onlineDot} />}
       </View>
 
       <View style={styles.textWrapper}>
-        <Text style={styles.userName}>{item.name}</Text>
-        <Text style={styles.subtitle}>Tap to chat</Text>
+        {/* Row: name + timestamp */}
+        <View style={styles.topRow}>
+          <Text
+            style={[styles.userName, item.unreadCount > 0 && styles.userNameBold]}
+            numberOfLines={1}
+          >
+            {item.name}
+          </Text>
+          {item.lastMessageAt ? (
+            <Text style={styles.timeLabel}>{formatTime(item.lastMessageAt)}</Text>
+          ) : null}
+        </View>
+
+        {/* Row: last message preview + unread badge */}
+        <View style={styles.bottomRow}>
+          <Text
+            style={[
+              styles.subtitle,
+              item.unreadCount > 0 && styles.subtitleUnread,
+            ]}
+            numberOfLines={1}
+            ellipsizeMode="tail"
+          >
+            {item.lastMessageText || 'Tap to chat'}
+          </Text>
+
+          {/* NEW: unread badge */}
+          {item.unreadCount > 0 && (
+            <View style={styles.badge}>
+              <Text style={styles.badgeText}>
+                {item.unreadCount > 99 ? '99+' : item.unreadCount}
+              </Text>
+            </View>
+          )}
+        </View>
       </View>
     </TouchableOpacity>
   );
@@ -96,7 +170,6 @@ const HomeScreen = () => {
 
       <View style={styles.header}>
         <Text style={styles.headerTitle}>Contacts</Text>
-
         <TouchableOpacity style={styles.addBtn}>
           <Text style={styles.addIcon}>+</Text>
         </TouchableOpacity>
@@ -132,29 +205,22 @@ const getStyles = theme =>
       backgroundColor: theme.backgroundPrimary,
       paddingTop: 30,
     },
-
     loader: {
       flex: 1,
       justifyContent: 'center',
       alignItems: 'center',
     },
-
-    /* HEADER */
-
     header: {
       paddingHorizontal: 20,
-      // marginBottom: 10,
       flexDirection: 'row',
       justifyContent: 'space-between',
       alignItems: 'center',
     },
-
     headerTitle: {
       fontSize: 23,
       fontWeight: '500',
       color: theme.textPrimary,
     },
-
     addBtn: {
       width: 36,
       height: 36,
@@ -162,32 +228,25 @@ const getStyles = theme =>
       justifyContent: 'center',
       alignItems: 'center',
     },
-
     addIcon: {
       fontSize: 20,
       color: theme.textPrimary,
       fontWeight: '600',
     },
-
-    /* USER ROW */
-
     userRow: {
       flexDirection: 'row',
       alignItems: 'center',
       paddingHorizontal: 20,
       paddingVertical: 14,
     },
-
     avatarWrapper: {
       position: 'relative',
     },
-
     avatarImg: {
       width: 58,
       height: 58,
       borderRadius: 16,
     },
-
     avatarPlaceholder: {
       width: 58,
       height: 58,
@@ -196,13 +255,11 @@ const getStyles = theme =>
       justifyContent: 'center',
       alignItems: 'center',
     },
-
     avatarText: {
       color: '#fff',
       fontSize: 20,
       fontWeight: '700',
     },
-
     onlineDot: {
       position: 'absolute',
       bottom: 2,
@@ -214,24 +271,61 @@ const getStyles = theme =>
       borderWidth: 2,
       borderColor: '#fff',
     },
-
     textWrapper: {
       marginLeft: 14,
       flex: 1,
     },
-
+    // NEW layout rows
+    topRow: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      alignItems: 'center',
+      marginBottom: 4,
+    },
+    bottomRow: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      alignItems: 'center',
+    },
     userName: {
       fontSize: 16,
-      fontWeight: '600',
+      fontWeight: '500',
       color: theme.textPrimary,
+      flex: 1,
+      marginRight: 8,
     },
-
-    subtitle: {
-      marginTop: 4,
-      fontSize: 13,
+    userNameBold: {
+      fontWeight: '700',
+    },
+    timeLabel: {
+      fontSize: 12,
       color: '#8E8E93',
     },
-
+    subtitle: {
+      fontSize: 13,
+      color: '#8E8E93',
+      flex: 1,
+      marginRight: 8,
+    },
+    subtitleUnread: {
+      color: theme.textPrimary,
+      fontWeight: '500',
+    },
+    // NEW badge
+    badge: {
+      backgroundColor: '#002DE3',
+      borderRadius: 10,
+      minWidth: 20,
+      height: 20,
+      justifyContent: 'center',
+      alignItems: 'center',
+      paddingHorizontal: 5,
+    },
+    badgeText: {
+      color: '#fff',
+      fontSize: 11,
+      fontWeight: '700',
+    },
     emptyText: {
       textAlign: 'center',
       marginTop: 40,

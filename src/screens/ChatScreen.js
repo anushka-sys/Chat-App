@@ -84,36 +84,73 @@ const ChatScreen = ({ route }) => {
     return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
   }
 
-  async function onSend() {
-    const text = inputText.trim();
-    if (!text) return; //check if empty
-    setInputText('');
-    setPreviewUrl('');
+  useEffect(() => {
+  if (!currentUser?.uid) return;
 
-    const newMessage = {
-      //message object
-      _id: firestore().collection('_').doc().id,
-      text: text,
-      createdAt: firestore.FieldValue.serverTimestamp(),
-      sentBy: currentUser.uid,
-      sentTo: receiverUid,
-      user: {
-        _id: currentUser.uid,
-        name:
-          senderName || currentUser.displayName || currentUser.email || 'User',
+  firestore()
+    .collection('conversations')
+    .doc(conversationId)
+    .set(
+      { unreadCounts: { [currentUser.uid]: 0 } },
+      { merge: true },
+    )
+    .catch(() => {});
+}, [conversationId, currentUser?.uid]);
+
+ async function onSend() {
+  const text = inputText.trim();
+  if (!text) return;
+  setInputText('');
+  setPreviewUrl('');
+
+  const newMessage = {
+    _id: firestore().collection('_').doc().id,
+    text,
+    createdAt: firestore.FieldValue.serverTimestamp(),
+    sentBy: currentUser.uid,
+    sentTo: receiverUid,
+    user: {
+      _id: currentUser.uid,
+      name: senderName || currentUser.displayName || currentUser.email || 'User',
+    },
+  };
+
+  // Optimistic update
+  setMessages(prev => [{ ...newMessage, createdAt: new Date() }, ...prev]);
+
+  try {
+    const batch = firestore().batch();
+
+    // Save the message
+    const msgRef = firestore()
+      .collection('conversations')
+      .doc(conversationId)
+      .collection('messages')
+      .doc(newMessage._id);
+    batch.set(msgRef, newMessage);
+
+    // Update conversation metadata
+    const convRef = firestore()
+      .collection('conversations')
+      .doc(conversationId);
+    batch.set(
+      convRef,
+      {
+        members: [currentUser.uid, receiverUid], // needed for the HomeScreen query
+        lastMessageText: text,
+        lastMessageAt: firestore.FieldValue.serverTimestamp(),
+        // Increment receiver's unread count, reset sender's to 0
+        [`unreadCounts.${receiverUid}`]: firestore.FieldValue.increment(1),
+        [`unreadCounts.${currentUser.uid}`]: 0,
       },
-    };
-    setMessages(prev => [{ ...newMessage, createdAt: new Date() }, ...prev]);
-    try {
-      await firestore() //save to firestore
-        .collection('conversations')
-        .doc(conversationId)
-        .collection('messages')
-        .add(newMessage);
-    } catch (e) {
-      console.log('Send error:', e);
-    }
+      { merge: true },
+    );
+
+    await batch.commit();
+  } catch (e) {
+    console.log('Send error:', e);
   }
+}
 
   function renderMessage({ item }) {
     // console.log(item)
@@ -171,7 +208,7 @@ const ChatScreen = ({ route }) => {
       <FlatList
         data={messages}
         keyExtractor={item => item._id}
-        renderItem={renderMessage}
+        renderItem={renderMessage} 
         inverted
         contentContainerStyle={styles.listContent}
         keyboardShouldPersistTaps="handled"
