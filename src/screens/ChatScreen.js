@@ -37,9 +37,7 @@ const ChatScreen = ({ route }) => {
   const headerHeight = useHeaderHeight();
   const currentUser = auth().currentUser;
 
-  const conversationId = [currentUser.uid, receiverUid]
-    .sort()
-    .join('_');
+  const conversationId = [currentUser.uid, receiverUid].sort().join('_');
 
   function extractUrl(text) {
     const urlRegex = /(https?:\/\/[^\s]+)/g;
@@ -84,10 +82,7 @@ const ChatScreen = ({ route }) => {
         snapshot.docs.forEach(async doc => {
           const data = doc.data();
 
-          if (
-            data.sentTo === currentUser.uid &&
-            data.status === 'sent'
-          ) {
+          if (data.sentTo === currentUser.uid && data.status === 'sent') {
             await doc.ref.update({
               status: 'delivered',
             });
@@ -220,10 +215,7 @@ const ChatScreen = ({ route }) => {
       user: {
         _id: currentUser.uid,
         name:
-          senderName ||
-          currentUser.displayName ||
-          currentUser.email ||
-          'User',
+          senderName || currentUser.displayName || currentUser.email || 'User',
       },
     };
 
@@ -249,19 +241,19 @@ const ChatScreen = ({ route }) => {
       const convRef = firestore()
         .collection('conversations')
         .doc(conversationId);
-const convSnap = await convRef.get();
+      const convSnap = await convRef.get();
 
-let exixtingUnread = convSnap.data()?.unreadCounts?.[receiverUid] || 0;
+      let exixtingUnread = convSnap.data()?.unreadCounts?.[receiverUid] || 0;
       batch.set(
         convRef,
         {
           members: [currentUser.uid, receiverUid],
           lastMessageText: text,
           lastMessageAt: firestore.FieldValue.serverTimestamp(),
-         unreadCounts:{
-          [receiverUid] : exixtingUnread + 1,
-          [currentUser.uid]: 0,
-         },
+          unreadCounts: {
+            [receiverUid]: exixtingUnread + 1,
+            [currentUser.uid]: 0,
+          },
         },
         { merge: true },
       );
@@ -295,23 +287,15 @@ let exixtingUnread = convSnap.data()?.unreadCounts?.[receiverUid] || 0;
 
     return (
       <View
-        style={[
-          styles.messageRow,
-          isMe ? styles.rowRight : styles.rowLeft,
-        ]}
+        style={[styles.messageRow, isMe ? styles.rowRight : styles.rowLeft]}
       >
         <View
-          style={[
-            styles.bubble,
-            isMe ? styles.bubbleRight : styles.bubbleLeft,
-          ]}
+          style={[styles.bubble, isMe ? styles.bubbleRight : styles.bubbleLeft]}
         >
           <Text
             style={[
               styles.senderName,
-              isMe
-                ? styles.senderNameRight
-                : styles.senderNameLeft,
+              isMe ? styles.senderNameRight : styles.senderNameLeft,
             ]}
           >
             {isMe ? 'You' : item.user?.name || 'Unknown User'}
@@ -326,15 +310,10 @@ let exixtingUnread = convSnap.data()?.unreadCounts?.[receiverUid] || 0;
             {item.text}
           </Text>
 
-          {urlInMessage && (
-            <LinkPreviewCard url={urlInMessage} />
-          )}
+          {urlInMessage && <LinkPreviewCard url={urlInMessage} />}
 
           <Text
-            style={[
-              styles.timeText,
-              isMe ? styles.timeRight : styles.timeLeft,
-            ]}
+            style={[styles.timeText, isMe ? styles.timeRight : styles.timeLeft]}
           >
             {formatTime(item.createdAt)}
           </Text>
@@ -358,9 +337,7 @@ let exixtingUnread = convSnap.data()?.unreadCounts?.[receiverUid] || 0;
       keyboardVerticalOffset={headerHeight}
     >
       {isTyping && (
-        <Text style={styles.typingText}>
-          {typingUser} is typing...
-        </Text>
+        <Text style={styles.typingText}>{typingUser} is typing...</Text>
       )}
 
       <FlatList
@@ -375,9 +352,7 @@ let exixtingUnread = convSnap.data()?.unreadCounts?.[receiverUid] || 0;
         windowSize={7}
         removeClippedSubviews={true}
         ListEmptyComponent={
-          <Text style={styles.emptyText}>
-            No messages yet
-          </Text>
+          <Text style={styles.emptyText}>No messages yet</Text>
         }
       />
 
@@ -389,11 +364,7 @@ let exixtingUnread = convSnap.data()?.unreadCounts?.[receiverUid] || 0;
             style={inputPreviewStyles.closeButton}
             onPress={() => setPreviewUrl('')}
           >
-            <Icon
-              name="close-circle"
-              size={20}
-              color="#555"
-            />
+            <Icon name="close-circle" size={20} color="#555" />
           </TouchableOpacity>
         </View>
       ) : null}
@@ -412,8 +383,7 @@ let exixtingUnread = convSnap.data()?.unreadCounts?.[receiverUid] || 0;
         <TouchableOpacity
           style={[
             styles.sendButton,
-            !inputText.trim() &&
-              styles.sendButtonDisabled,
+            !inputText.trim() && styles.sendButtonDisabled,
           ]}
           onPress={onSend}
           disabled={!inputText.trim()}
