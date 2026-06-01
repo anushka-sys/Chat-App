@@ -65,7 +65,7 @@ const HomeScreen = () => {
         snapshot.docs.forEach(doc => {
           const data = doc.data();
 
-          meta[doc.id] = {
+          meta[doc.id] = {          //  using conversation id as key for lookup      
             lastMessageText:
               data.lastMessageText || '',
             lastMessageAt:
